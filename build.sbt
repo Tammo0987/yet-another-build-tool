@@ -52,6 +52,7 @@ lazy val yamlProjectProvider = project
     name := "yaml-project-provider",
     libraryDependencies += "io.circe" %% "circe-yaml" % "0.15.1",
     libraryDependencies += "io.circe" %% "circe-generic" % "0.14.6",
-    libraryDependencies += "io.circe" %% "circe-parser" % "0.14.6"
+    libraryDependencies += "io.circe" %% "circe-parser" % "0.14.6",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.17" % Test
   )
   .dependsOn(projectResolverApi)
