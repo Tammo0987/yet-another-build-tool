@@ -43,13 +43,13 @@ lazy val projectResolverApi = project
 lazy val integration = project
   .in(file("integration"))
   .settings(yabtModule)
-  .aggregate(yamlProjectProvider)
+  .aggregate(yamlProjectResolver)
 
-lazy val yamlProjectProvider = project
-  .in(file("integration/yaml-project-provider"))
+lazy val yamlProjectResolver = project
+  .in(file("integration/yaml-project-resolver"))
   .settings(scalaModule)
   .settings(
-    name := "yaml-project-provider",
+    name := "yaml-project-resolver",
     libraryDependencies += "io.circe" %% "circe-yaml" % "0.15.1",
     libraryDependencies += "io.circe" %% "circe-generic" % "0.14.6",
     libraryDependencies += "io.circe" %% "circe-parser" % "0.14.6",
