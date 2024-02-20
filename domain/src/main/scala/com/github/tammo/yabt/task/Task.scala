@@ -2,7 +2,7 @@ package com.github.tammo.yabt.task
 
 import com.github.tammo.yabt.task.Task.*
 
-case class Task[+T](info: Info, computation: Computation[T])
+case class Task[+T](info: Info, computation: TaskContext => Computation[T])
 
 private[task] object Task:
 
