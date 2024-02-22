@@ -4,12 +4,7 @@ import com.github.tammo.yabt.dependency.DependencyDomain.{Dependency, Version}
 import com.github.tammo.yabt.task.Task
 import com.github.tammo.yabt.task.Task.Pure
 import com.github.tammo.yabt.task.TaskDSL.task
-import com.github.tammo.yabt.task.jvm.compile.{
-  CompileTask,
-  CoursierDependencyResolver,
-  DefaultBridgeProvider,
-  DefaultScalaCompiler
-}
+import com.github.tammo.yabt.task.jvm.compile.*
 
 import java.nio.file.{Files, Path, Paths}
 import java.util.Comparator
@@ -52,23 +47,12 @@ object JVMTasks {
 
   lazy val compile: Task[Seq[Path]] =
     task("compile", "Compiles all sources of a module.") { context =>
+      val scalaVersion = "2.13.12"
       val dependencyResolver = CoursierDependencyResolver
-
-      val compilerBridgeFile = dependencyResolver
-        .resolveDependencies(
-          // zinc version
-          Seq(Dependency(DefaultScalaCompiler.compilerBridge, Version("1.9.6")))
-        )
-        .head
-        .toFile
-
       val bridgeProvider =
-        DefaultBridgeProvider(null, compilerBridgeFile)
-      val scalaCompiler = DefaultScalaCompiler(
-        "2.13.12",
-        dependencyResolver,
-        bridgeProvider
-      )
+        DefaultBridgeProvider(scalaVersion, dependencyResolver)
+      val scalaCompiler =
+        ScalaCompilerFactory.createScalaCompiler(scalaVersion, bridgeProvider)
       val compileTask = CompileTask(dependencyResolver, scalaCompiler)
 
       Pure(compileTask.compile(using context))

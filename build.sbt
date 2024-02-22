@@ -95,8 +95,3 @@ lazy val app = project
   .in(file("app"))
   .settings(scalaModule)
   .dependsOn(core, yamlProjectResolver, sequentialTaskEvaluator, jvm)
-
-lazy val testModule = project
-  .in(file("test-module"))
-  .settings(scalaModule)
-  .settings(name := "test-module")

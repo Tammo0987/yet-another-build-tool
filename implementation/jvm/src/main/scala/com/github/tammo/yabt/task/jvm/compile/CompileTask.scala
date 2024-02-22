@@ -29,11 +29,11 @@ class CompileTask(
     val classesDirectory = moduleDirectory / "target" / "classes"
 
     if (Files.notExists(source)) {
-      Files.createDirectory(source)
+      Files.createDirectories(source)
     }
 
     if (Files.notExists(classesDirectory)) {
-      Files.createDirectory(classesDirectory)
+      Files.createDirectories(classesDirectory)
     }
 
     val sources = Files
@@ -103,6 +103,7 @@ class CompileTask(
       override def modifiedClasses(): Array[String] =
         sourceSet.map(_.toString).toArray
 
+  // TODO place in shared module?
   extension (path: Path) {
 
     @targetName("slash")
