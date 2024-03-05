@@ -1,10 +1,10 @@
 package com.github.tammo.yabt.project
 
 import com.github.tammo.yabt.Error.*
-import com.github.tammo.yabt.extensions.MapExtensions.liftMapToEither
+import com.github.tammo.yabt.extensions.MapExtensions.liftToEither
 import com.github.tammo.yabt.ResolvableProject.{Scope as ResolvableScope, *}
 import com.github.tammo.yabt.ResolvedProject.*
-import com.github.tammo.yabt.extensions.SetExtensions.liftSetToEither
+import com.github.tammo.yabt.extensions.SetExtensions.liftToEither
 
 class DefaultProjectResolver(private val projectReader: ProjectReader)
     extends ProjectResolver {
@@ -76,14 +76,14 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       .map { module =>
         combineModuleIncludesRecursive(Right(module), Seq(ROOT))
       }
-      .liftSetToEither()
+      .liftToEither()
       .map(set =>
         set.groupMapReduce(module => Name.apply(module.name.get))(identity) {
           case (_, s) => s
         }
       )
       .flatMap { map =>
-        map.view.mapValues(resolveModules).toMap.liftMapToEither()
+        map.view.mapValues(resolveModules).toMap.liftToEither()
       }
   }
 

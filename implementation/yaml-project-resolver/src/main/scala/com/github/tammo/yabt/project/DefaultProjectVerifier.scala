@@ -2,8 +2,8 @@ package com.github.tammo.yabt.project
 
 import com.github.tammo.yabt.Error.*
 import com.github.tammo.yabt.ResolvedProject.*
-import com.github.tammo.yabt.extensions.MapExtensions.liftMapToEither
-import com.github.tammo.yabt.extensions.SetExtensions.liftSetToEither
+import com.github.tammo.yabt.extensions.MapExtensions.liftToEither
+import com.github.tammo.yabt.extensions.SetExtensions.liftToEither
 import com.github.tammo.yabt.{Error, ResolvedProject}
 
 object DefaultProjectVerifier extends ProjectVerifier {
@@ -44,10 +44,10 @@ object DefaultProjectVerifier extends ProjectVerifier {
           .map(name =>
             project.modules.get(name).toRight(MissingReference(name.toString))
           )
-          .liftSetToEither()
+          .liftToEither()
       )
       .toMap
-      .liftMapToEither()
+      .liftToEither()
       .map(_ => project)
 
   private def verifyNoCycleInModuleDependencies(
@@ -82,7 +82,7 @@ object DefaultProjectVerifier extends ProjectVerifier {
               findCycles(resolvedModule, path :+ module.toString)
             }
           })
-          .liftSetToEither()
+          .liftToEither()
           .map(_ => project)
       }
     }
@@ -90,7 +90,7 @@ object DefaultProjectVerifier extends ProjectVerifier {
     project.modules.view
       .mapValues(module => findCycles(module, Seq.empty))
       .toMap
-      .liftMapToEither()
+      .liftToEither()
       .flatMap(_ => Right(project))
   }
 
