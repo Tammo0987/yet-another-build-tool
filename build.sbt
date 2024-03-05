@@ -90,7 +90,7 @@ lazy val yamlProjectResolver = project
     libraryDependencies += "io.circe" %% "circe-parser" % "0.14.6",
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.17" % Test
   )
-  .dependsOn(projectResolverApi)
+  .dependsOn(projectResolverApi, shared)
 
 lazy val sequentialTaskEvaluator = project
   .in(file("implementation/sequential-task-evaluator"))
