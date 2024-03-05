@@ -2,17 +2,17 @@ package com.github.tammo.yabt.task.jvm.compile
 
 import com.github.tammo.yabt.dependency.DependencyDomain.*
 import com.github.tammo.yabt.dependency.DependencyResolver
+import com.github.tammo.yabt.extensions.PathExtensions.*
 import com.github.tammo.yabt.task.TaskContext
 import com.github.tammo.yabt.task.jvm.TestAnalysesCallback
 import sbt.internal.inc.{PlainVirtualFile, PlainVirtualFileConverter}
 import xsbti.*
-import xsbti.compile.{DependencyChanges, ScalaCompiler, SingleOutput}
+import xsbti.compile.*
 
 import java.io.File
 import java.nio.file.{Files, Path}
 import java.util.Optional
 import java.util.function.Supplier
-import scala.annotation.targetName
 import scala.jdk.CollectionConverters.*
 
 class CompileTask(
@@ -104,14 +104,5 @@ class CompileTask(
         sourceSet.map(_.toString).toArray
 
   // TODO place in shared module?
-  extension (path: Path) {
-
-    @targetName("slash")
-    private def /(subPath: Path): Path = path.resolve(subPath)
-
-    @targetName("slash")
-    private def /(subPath: String): Path = /(Path.of(subPath))
-
-  }
 
 }

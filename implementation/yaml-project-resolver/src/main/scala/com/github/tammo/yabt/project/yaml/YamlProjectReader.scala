@@ -31,7 +31,12 @@ class YamlProjectReader extends ProjectReader {
   ): Either[ResolveError, T] = {
     val readFile = Try {
       new FileReader(location)
-    }.toEither.left.map(throwable => FileError(throwable.getMessage, throwable))
+    }.toEither.left.map(throwable =>
+      FileError(
+        Option(throwable).map(_.getMessage).getOrElse("No explicit message"),
+        throwable
+      )
+    )
 
     readFile
       .flatMap(parseYaml)

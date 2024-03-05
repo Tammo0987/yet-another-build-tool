@@ -1,6 +1,5 @@
 package com.github.tammo.yabt.task.jvm
 
-import com.github.tammo.yabt.dependency.DependencyDomain.{Dependency, Version}
 import com.github.tammo.yabt.task.Task
 import com.github.tammo.yabt.task.Task.Pure
 import com.github.tammo.yabt.task.TaskDSL.task

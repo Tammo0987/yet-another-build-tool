@@ -6,9 +6,8 @@ import com.github.tammo.yabt.ResolvableProject.{Scope as ResolvableScope, *}
 import com.github.tammo.yabt.ResolvedProject.*
 import com.github.tammo.yabt.extensions.SetExtensions.liftSetToEither
 
-trait DefaultProjectResolver extends ProjectResolver {
-
-  def projectReader: ProjectReader
+class DefaultProjectResolver(private val projectReader: ProjectReader)
+    extends ProjectResolver {
 
   private val ROOT = "build"
 

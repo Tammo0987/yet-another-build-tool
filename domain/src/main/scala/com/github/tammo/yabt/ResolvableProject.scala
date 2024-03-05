@@ -1,7 +1,5 @@
 package com.github.tammo.yabt
 
-import scala.annotation.targetName
-
 object ResolvableProject {
 
   case class ResolvableProject(

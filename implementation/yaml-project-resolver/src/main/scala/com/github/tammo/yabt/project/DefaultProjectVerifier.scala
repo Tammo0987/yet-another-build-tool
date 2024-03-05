@@ -1,12 +1,10 @@
 package com.github.tammo.yabt.project
 
 import com.github.tammo.yabt.Error.*
+import com.github.tammo.yabt.ResolvedProject.*
 import com.github.tammo.yabt.extensions.MapExtensions.liftMapToEither
 import com.github.tammo.yabt.extensions.SetExtensions.liftSetToEither
-import com.github.tammo.yabt.ResolvedProject.*
 import com.github.tammo.yabt.{Error, ResolvedProject}
-
-import scala.annotation.tailrec
 
 object DefaultProjectVerifier extends ProjectVerifier {
 

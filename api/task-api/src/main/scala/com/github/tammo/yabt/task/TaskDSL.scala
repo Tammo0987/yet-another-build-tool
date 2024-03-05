@@ -2,8 +2,6 @@ package com.github.tammo.yabt.task
 
 import com.github.tammo.yabt.task.Task.*
 
-import scala.annotation.targetName
-
 object TaskDSL {
 
   // def task[T](name: String, description: String)(f: TaskContext => T): Task[T] =
