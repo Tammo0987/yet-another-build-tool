@@ -15,7 +15,24 @@ lazy val yabtModule: Seq[Setting[?]] = Seq(
 )
 
 lazy val scalaModule: Seq[Setting[?]] = yabtModule ++ Seq(
-  scalaVersion := "3.3.1"
+  scalaVersion := "3.4.0",
+  scalacOptions := Seq(
+    "-encoding",
+    "UTF-8",
+    "-deprecation",
+    "-feature",
+    "-unchecked",
+    // "-Wvalue-discard",
+    "-Wunused:implicits",
+    "-Wunused:explicits",
+    "-Wunused:imports",
+    "-Wunused:locals",
+    "-Wunused:params",
+    "-Wunused:privates",
+    "-Xfatal-warnings",
+    // "-Yexplicit-nulls",
+    "-Ysafe-init"
+  )
 )
 
 lazy val root = (project in file("."))
@@ -32,7 +49,7 @@ lazy val domain = project
 lazy val api = project
   .in(file("api"))
   .settings(yabtModule)
-  .aggregate(projectResolverApi, taskApi, dependencyApi)
+  .aggregate(projectResolverApi, taskApi, dependencyApi, cliApi)
 
 lazy val projectResolverApi = project
   .in(file("api/project-resolver"))
@@ -52,10 +69,16 @@ lazy val dependencyApi = project
   .settings(name := "dependency-api")
   .dependsOn(domain)
 
+lazy val cliApi = project
+  .in(file("api/cli-api"))
+  .settings(scalaModule)
+  .settings(name := "cli-api")
+  .dependsOn(domain)
+
 lazy val implementation = project
   .in(file("implementation"))
   .settings(yabtModule)
-  .aggregate(yamlProjectResolver)
+  .aggregate(yamlProjectResolver, sequentialTaskEvaluator, jvm, consoleCli)
 
 lazy val yamlProjectResolver = project
   .in(file("implementation/yaml-project-resolver"))
@@ -84,14 +107,30 @@ lazy val jvm = project
       "io.get-coursier" %% "coursier" % "2.1.9" cross CrossVersion.for3Use2_13
     )
   )
-  .dependsOn(taskApi, dependencyApi)
+  .dependsOn(taskApi, dependencyApi, shared)
+
+lazy val consoleCli = project
+  .in(file("implementation/console-cli"))
+  .settings(scalaModule)
+  .settings(name := "console-cli")
+  .dependsOn(cliApi)
+
+lazy val shared = project
+  .in(file("shared"))
+  .settings(scalaModule)
 
 lazy val core = project
   .in(file("core"))
   .settings(scalaModule)
-  .dependsOn(projectResolverApi, taskApi)
+  .dependsOn(projectResolverApi, taskApi, cliApi)
 
 lazy val app = project
   .in(file("app"))
   .settings(scalaModule)
-  .dependsOn(core, yamlProjectResolver, sequentialTaskEvaluator, jvm)
+  .dependsOn(
+    core,
+    yamlProjectResolver,
+    sequentialTaskEvaluator,
+    jvm,
+    consoleCli
+  )
