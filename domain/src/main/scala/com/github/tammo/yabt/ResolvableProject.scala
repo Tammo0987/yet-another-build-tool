@@ -1,5 +1,7 @@
 package com.github.tammo.yabt
 
+import scala.annotation.targetName
+
 object ResolvableProject {
 
   case class ResolvableProject(
@@ -25,6 +27,7 @@ object ResolvableProject {
       includes: Seq[String] = Seq.empty
   ) {
 
+    @targetName("combine")
     def ++(other: ResolvableModule): ResolvableModule = {
       ResolvableModule(
         name.orElse(other.name),
