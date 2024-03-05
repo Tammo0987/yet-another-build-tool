@@ -79,7 +79,7 @@ class DefaultBridgeProvider(
 
 object DefaultBridgeProvider:
 
-  lazy val compilerBridge: Module = Module(
+  private lazy val compilerBridge: Module = Module(
     GroupId("org.scala-sbt"),
     ArtifactId("compiler-bridge_2.13") // TODO version
   )

@@ -1,5 +1,6 @@
 package com.github.tammo.yabt.task.jvm
 
+import com.github.tammo.yabt.dependency.DependencyResolver
 import com.github.tammo.yabt.task.Task
 import com.github.tammo.yabt.task.Task.Pure
 import com.github.tammo.yabt.task.TaskDSL.task
@@ -47,7 +48,8 @@ object JVMTasks {
   lazy val compile: Task[Seq[Path]] =
     task("compile", "Compiles all sources of a module.") { context =>
       val scalaVersion = "2.13.12"
-      val dependencyResolver = CoursierDependencyResolver
+      val dependencyResolver: DependencyResolver =
+        ??? // TODO: how to get implementations?
       val bridgeProvider =
         DefaultBridgeProvider(scalaVersion, dependencyResolver)
       val scalaCompiler =

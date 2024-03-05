@@ -1,12 +1,10 @@
-package com.github.tammo.yabt.task.jvm.compile
+package com.github.tammo.yabt.dependency
 
-import com.github.tammo.yabt.dependency.{DependencyDomain, DependencyResolver}
 import coursier.core.{Dependency, Module}
 import coursier.{Fetch, ModuleName, Organization}
 
 import java.nio.file.Path
 
-// TODO move to another module
 object CoursierDependencyResolver extends DependencyResolver {
 
   override def resolveDependencies(

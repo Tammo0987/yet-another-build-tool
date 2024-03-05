@@ -78,7 +78,13 @@ lazy val cliApi = project
 lazy val implementation = project
   .in(file("implementation"))
   .settings(yabtModule)
-  .aggregate(yamlProjectResolver, sequentialTaskEvaluator, jvm, consoleCli)
+  .aggregate(
+    yamlProjectResolver,
+    sequentialTaskEvaluator,
+    jvm,
+    consoleCli,
+    coursierDependencyResolver
+  )
 
 lazy val yamlProjectResolver = project
   .in(file("implementation/yaml-project-resolver"))
@@ -103,8 +109,7 @@ lazy val jvm = project
   .settings(scalaModule)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-sbt" %% "zinc" % "1.9.6" cross CrossVersion.for3Use2_13,
-      "io.get-coursier" %% "coursier" % "2.1.9" cross CrossVersion.for3Use2_13
+      "org.scala-sbt" %% "zinc" % "1.9.6" cross CrossVersion.for3Use2_13
     )
   )
   .dependsOn(taskApi, dependencyApi, shared)
@@ -114,6 +119,16 @@ lazy val consoleCli = project
   .settings(scalaModule)
   .settings(name := "console-cli")
   .dependsOn(cliApi)
+
+lazy val coursierDependencyResolver = project
+  .in(file("implementation/coursier-dependency-resolver"))
+  .settings(scalaModule)
+  .settings(
+    name := "coursier-dependency-resolver",
+    libraryDependencies +=
+      "io.get-coursier" %% "coursier" % "2.1.9" cross CrossVersion.for3Use2_13
+  )
+  .dependsOn(dependencyApi)
 
 lazy val shared = project
   .in(file("shared"))
