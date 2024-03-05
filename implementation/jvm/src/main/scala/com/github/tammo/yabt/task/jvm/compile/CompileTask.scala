@@ -18,7 +18,7 @@ import scala.jdk.CollectionConverters.*
 class CompileTask(
     private val dependencyResolver: DependencyResolver,
     private val scalaCompiler: ScalaCompiler
-) {
+):
 
   private val libraryModule =
     Module(GroupId("org.scala-lang"), ArtifactId("scala-library"))
@@ -102,7 +102,3 @@ class CompileTask(
         new Array[VirtualFileRef](0)
       override def modifiedClasses(): Array[String] =
         sourceSet.map(_.toString).toArray
-
-  // TODO place in shared module?
-
-}
