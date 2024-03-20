@@ -22,7 +22,6 @@ lazy val scalaModule: Seq[Setting[?]] = yabtModule ++ Seq(
     "-deprecation",
     "-feature",
     "-unchecked",
-    // "-Wvalue-discard",
     "-Wunused:implicits",
     "-Wunused:explicits",
     "-Wunused:imports",
@@ -30,7 +29,6 @@ lazy val scalaModule: Seq[Setting[?]] = yabtModule ++ Seq(
     "-Wunused:params",
     "-Wunused:privates",
     "-Xfatal-warnings",
-    // "-Yexplicit-nulls",
     "-Ysafe-init"
   )
 )
@@ -49,7 +47,7 @@ lazy val domain = project
 lazy val api = project
   .in(file("api"))
   .settings(yabtModule)
-  .aggregate(projectResolverApi, taskApi, dependencyApi, cliApi)
+  .aggregate(projectResolverApi, taskApi, dependencyApi, cliApi, moduleApi)
 
 lazy val projectResolverApi = project
   .in(file("api/project-resolver"))
@@ -74,6 +72,12 @@ lazy val cliApi = project
   .settings(scalaModule)
   .settings(name := "cli-api")
   .dependsOn(domain)
+
+lazy val moduleApi = project
+  .in(file("api/module-api"))
+  .settings(scalaModule)
+  .settings(name := "module-api")
+  .dependsOn(dependencyApi, taskApi)
 
 lazy val implementation = project
   .in(file("implementation"))
@@ -137,7 +141,7 @@ lazy val shared = project
 lazy val core = project
   .in(file("core"))
   .settings(scalaModule)
-  .dependsOn(projectResolverApi, taskApi, cliApi)
+  .dependsOn(projectResolverApi, taskApi, cliApi, dependencyApi, moduleApi)
 
 lazy val app = project
   .in(file("app"))
@@ -147,5 +151,6 @@ lazy val app = project
     yamlProjectResolver,
     sequentialTaskEvaluator,
     jvm,
-    consoleCli
+    consoleCli,
+    coursierDependencyResolver
   )

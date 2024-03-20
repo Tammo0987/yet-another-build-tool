@@ -19,7 +19,7 @@ object JVMTasks {
 
       Files
         .walk(targetDirectory)
-        .sorted(Comparator.reverseOrder())
+        .sorted(Comparator.reverseOrder()) // todo necessary?
         .forEach(Files.deleteIfExists(_))
 
       Pure(())
