@@ -7,23 +7,9 @@ import com.github.tammo.yabt.task.TaskDSL.task
 import com.github.tammo.yabt.task.jvm.compile.*
 
 import java.nio.file.{Files, Path, Paths}
-import java.util.Comparator
 import scala.jdk.CollectionConverters.*
 
 object JVMTasks {
-
-  lazy val cleanTask: Task[Unit] =
-    task("clean", "Cleans all generated files.") { context =>
-      val targetDirectory =
-        Paths.get(context.workingDirectory.toString, "target")
-
-      Files
-        .walk(targetDirectory)
-        .sorted(Comparator.reverseOrder()) // todo necessary?
-        .forEach(Files.deleteIfExists(_))
-
-      Pure(())
-    }
 
   lazy val collectSources: Task[Seq[Path]] =
     task("sources", "Collects all sources of a module.") { context =>
