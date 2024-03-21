@@ -1,43 +1,73 @@
 package com.github.tammo.yabt.module
 
+import com.github.tammo.yabt.extensions.SetExtensions.liftToEither
+import com.github.tammo.yabt.module.ModuleDiscovery.DiscoveryError
+
 import java.nio.file.{Files, Path}
 import scala.jdk.CollectionConverters.*
+import scala.util.Try
 
 object ClasspathModuleDiscovery extends ModuleDiscovery:
 
-  override def discoverModules: Set[Module] = {
-    val classLoader = Thread.currentThread().getContextClassLoader
-    val resources = classLoader.getResource("")
+  private val YABT_PACKAGE = "com.github.tammo.yabt"
 
-    val classPath = Path.of(resources.toURI)
-
-    Files
-      .walk(classPath)
-      .toList
-      .asScala
-      .filterNot(Files.isDirectory(_))
-      .filter(_.toString.endsWith(".class"))
-      .map(
-        classPath
-          .relativize(_)
-          .toString
-          .stripSuffix(".class")
-          .replace("/", ".")
-      )
-      .map(Class.forName)
-      .filter(classOf[Module].isAssignableFrom(_))
-      .filter(x => x != classOf[Module])
-      .flatMap { clazz =>
-        try {
-          Some(
-            clazz.getDeclaredConstructor().newInstance().asInstanceOf[Module]
-          )
-        } catch
-          // TODO change result type
-          case e: Throwable =>
-            println(e.getMessage)
-            e.printStackTrace()
-            None
+  override def discoverModules: Either[DiscoveryError, Set[Module]] =
+    loadClassesInPackage(YABT_PACKAGE, getClass.getClassLoader)
+      .flatMap {
+        _.filter(classOf[Module].isAssignableFrom(_))
+          .filter(x => x != classOf[Module])
+          .map(loadModule)
+          .liftToEither()
       }
+
+  private def loadClassesInPackage(
+      packageName: String,
+      classLoader: ClassLoader
+  ): Either[DiscoveryError, Set[Class[?]]] =
+    classLoader
+      .getResources(packageName.replace('.', '/'))
+      .asIterator()
+      .asScala
       .toSet
-  }
+      .filter(_.getProtocol == "file")
+      .map(url => Path.of(url.toURI))
+      .filter(Files.isDirectory(_))
+      .map(loadClassesInDirectory(_, packageName))
+      .liftToEither()
+      .map(_.flatten)
+
+  private def loadClassesInDirectory(
+      directory: Path,
+      packageName: String
+  ): Either[DiscoveryError, Set[Class[?]]] = Files
+    .walk(directory)
+    .toList
+    .asScala
+    .filter(_.toString.endsWith(".class"))
+    .map(directory.relativize)
+    .map(path =>
+      s"$packageName.${path.toString.replace("/", ".").dropRight(6)}"
+    )
+    .map(className =>
+      Try(Class.forName(className)).toEither.left.map(throwable =>
+        DiscoveryError(throwable.getMessage)
+      )
+    )
+    .toSet
+    .liftToEither()
+
+  private def loadModule(clazz: Class[?]): Either[DiscoveryError, Module] =
+    val classInstance = Try(
+      clazz.getDeclaredConstructor().newInstance().asInstanceOf[Module]
+    )
+    val objectInstance = Try(
+      clazz.getField("MODULE$").get(clazz).asInstanceOf[Module]
+    )
+
+    classInstance
+      .orElse(objectInstance)
+      .toEither
+      .left
+      .map { t =>
+        DiscoveryError(t.getMessage)
+      }

@@ -116,7 +116,7 @@ lazy val jvm = project
       "org.scala-sbt" %% "zinc" % "1.9.6" cross CrossVersion.for3Use2_13
     )
   )
-  .dependsOn(taskApi, dependencyApi, shared)
+  .dependsOn(taskApi, dependencyApi, moduleApi, shared)
 
 lazy val consoleCli = project
   .in(file("implementation/console-cli"))
@@ -152,5 +152,6 @@ lazy val app = project
     sequentialTaskEvaluator,
     jvm,
     consoleCli,
-    coursierDependencyResolver
+    coursierDependencyResolver,
+    shared
   )

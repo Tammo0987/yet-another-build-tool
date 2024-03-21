@@ -25,14 +25,24 @@ class CoreApplication(
       case Left(value)  => println(value)
       case Right(value) => println(value)
 
-    val modules = moduleDiscovery.discoverModules
+    moduleDiscovery.discoverModules match
+      case Left(discoveryError) => println(discoveryError)
+      case Right(modules) =>
+        val commands = modules.flatMap(module =>
+          module.commands ++ module.commands(serviceProvider)
+        )
+        val commandLineInterface = commandLineInterfaceProvider(commands)
 
-    val commands = modules.flatMap(module =>
-      module.commands ++ module.commands(serviceProvider)
-    )
-    val commandLineInterface = commandLineInterfaceProvider(commands)
+        val recognizedTasks =
+          modules.flatMap(module =>
+            module.tasks ++ module.tasks(serviceProvider)
+          )
 
-    println(commandLineInterface.processArguments(input))
+        recognizedTasks
+          .map(_.info.name)
+          .foreach(taskName => println(s"Recognized task: $taskName"))
+
+        println(commandLineInterface.processArguments(input))
   }
 
 }

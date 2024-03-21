@@ -1,5 +1,11 @@
 package com.github.tammo.yabt.module
 
+import com.github.tammo.yabt.module.ModuleDiscovery.DiscoveryError
+
 trait ModuleDiscovery:
 
-  def discoverModules: Set[Module]
+  def discoverModules: Either[DiscoveryError, Set[Module]]
+
+object ModuleDiscovery:
+
+  case class DiscoveryError(error: String)
