@@ -2,7 +2,7 @@ package com.github.tammo.yabt.task
 
 import com.github.tammo.yabt.task.Task.*
 
-class SequentialTaskEvaluator extends TaskEvaluator:
+object SequentialTaskEvaluator extends TaskEvaluator:
 
   override def evaluateTask[T](task: Task[T])(using
       taskContext: TaskContext

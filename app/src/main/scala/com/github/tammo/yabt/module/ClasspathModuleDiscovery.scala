@@ -49,8 +49,8 @@ object ClasspathModuleDiscovery extends ModuleDiscovery:
       s"$packageName.${path.toString.replace("/", ".").dropRight(6)}"
     )
     .map(className =>
-      Try(Class.forName(className)).toEither.left.map(throwable =>
-        DiscoveryError(throwable.getMessage)
+      Try(Class.forName(className)).toEither.left.map(t =>
+        DiscoveryError(t.getMessage, t)
       )
     )
     .toSet
@@ -69,5 +69,5 @@ object ClasspathModuleDiscovery extends ModuleDiscovery:
       .toEither
       .left
       .map { t =>
-        DiscoveryError(t.getMessage)
+        DiscoveryError(t.getMessage, t)
       }

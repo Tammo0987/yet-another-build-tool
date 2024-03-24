@@ -18,6 +18,7 @@ object ResolvedProject {
   object ModuleReference:
     def apply(string: String): ModuleReference = string
 
+  // TODO same as module?
   case class ResolvedProject(
       name: Name,
       organization: Organization,

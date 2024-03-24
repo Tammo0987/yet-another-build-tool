@@ -1,6 +1,7 @@
 package com.github.tammo.yabt
 
-object Error {
+// TODO rename
+object Error:
 
   sealed trait ResolveError
 
@@ -13,5 +14,3 @@ object Error {
   case class MissingReference(reference: String) extends ResolveError
   case class IllegalRootReference(path: Seq[String]) extends ResolveError
   case class CyclicReference(path: Seq[String]) extends ResolveError
-
-}

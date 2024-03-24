@@ -1,0 +1,19 @@
+<Configuration xmlns="http://logging.apache.org/log4j/2.0/config">
+    <Properties>
+        <Property name="LOG_PATTERN">
+            [%highlight{${LOG_LEVEL_PATTERN:-%p}}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=green, TRACE=green}] %d{HH:mm:ss} - %m%n%ex
+        </Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="console" />
+        </Root>
+    </Loggers>
+</Configuration>

@@ -33,6 +33,8 @@ lazy val scalaModule: Seq[Setting[?]] = yabtModule ++ Seq(
   )
 )
 
+lazy val slf4j: ModuleID = "org.slf4j" % "slf4j-api" % "2.0.12"
+
 lazy val root = (project in file("."))
   .settings(yabtModule)
   .settings(
@@ -105,7 +107,7 @@ lazy val yamlProjectResolver = project
 lazy val sequentialTaskEvaluator = project
   .in(file("implementation/sequential-task-evaluator"))
   .settings(scalaModule)
-  .settings(name := "sequential-task-evaluator")
+  .settings(name := "sequential-task-evaluator", libraryDependencies += slf4j)
   .dependsOn(taskApi)
 
 lazy val jvm = project
@@ -113,7 +115,8 @@ lazy val jvm = project
   .settings(scalaModule)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-sbt" %% "zinc" % "1.9.6" cross CrossVersion.for3Use2_13
+      "org.scala-sbt" %% "zinc" % "1.9.6" cross CrossVersion.for3Use2_13,
+      slf4j
     )
   )
   .dependsOn(taskApi, dependencyApi, moduleApi, shared)
@@ -141,11 +144,22 @@ lazy val shared = project
 lazy val core = project
   .in(file("core"))
   .settings(scalaModule)
+  .settings(
+    libraryDependencies += slf4j
+  )
   .dependsOn(projectResolverApi, taskApi, cliApi, dependencyApi, moduleApi)
 
 lazy val app = project
   .in(file("app"))
   .settings(scalaModule)
+  .settings(
+    libraryDependencies ++= Seq(
+      slf4j,
+      "org.apache.logging.log4j" % "log4j-slf4j2-impl" % "2.22.1" % Runtime,
+      "org.apache.logging.log4j" % "log4j-api" % "2.22.1" % Runtime,
+      "org.apache.logging.log4j" % "log4j-core" % "2.22.1" % Runtime
+    )
+  )
   .dependsOn(
     core,
     yamlProjectResolver,

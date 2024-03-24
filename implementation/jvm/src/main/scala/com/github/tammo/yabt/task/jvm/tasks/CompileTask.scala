@@ -1,10 +1,19 @@
-package com.github.tammo.yabt.task.jvm.compile
+package com.github.tammo.yabt.task.jvm.tasks
 
 import com.github.tammo.yabt.dependency.DependencyDomain.*
 import com.github.tammo.yabt.dependency.DependencyResolver
 import com.github.tammo.yabt.extensions.PathExtensions.*
-import com.github.tammo.yabt.task.TaskContext
+import com.github.tammo.yabt.task.Task.Pure
+import com.github.tammo.yabt.task.TaskDSL.task
 import com.github.tammo.yabt.task.jvm.TestAnalysesCallback
+import com.github.tammo.yabt.task.jvm.compile.{
+  CompilerLoggerAdapter,
+  DefaultBridgeProvider,
+  ScalaCompilerFactory
+}
+import com.github.tammo.yabt.task.jvm.tasks.CompileTask.*
+import com.github.tammo.yabt.task.{Task, TaskContext}
+import org.slf4j.LoggerFactory
 import sbt.internal.inc.{PlainVirtualFile, PlainVirtualFileConverter}
 import xsbti.*
 import xsbti.compile.*
@@ -12,20 +21,25 @@ import xsbti.compile.*
 import java.io.File
 import java.nio.file.{Files, Path}
 import java.util.Optional
-import java.util.function.Supplier
 import scala.jdk.CollectionConverters.*
 
 class CompileTask(
-    private val dependencyResolver: DependencyResolver,
-    private val scalaCompiler: ScalaCompiler
-):
+    private val dependencyResolver: DependencyResolver
+) {
 
-  private val libraryModule =
-    Module(GroupId("org.scala-lang"), ArtifactId("scala-library"))
+  lazy val compileTask: Task[Set[Path]] =
+    task("compile", "Compiles all sources of a module") { context =>
+      Pure(compile(context))
+    }
 
-  def compile(using context: TaskContext): Seq[Path] = {
-    val moduleDirectory = context.workingDirectory / context.module.toString
-    val source = moduleDirectory / "src" / "main" / "scala" // TODO source sets
+  private val logger = LoggerFactory.getLogger(getClass)
+
+  private def compile(context: TaskContext): Set[Path] = {
+    val moduleDirectory =
+      context.workingDirectory /// context.module.toString // TODO fix module access
+    val source =
+      moduleDirectory / "src" / "main" / "scala" // TODO introduce source sets
+
     val classesDirectory = moduleDirectory / "target" / "classes"
 
     if (Files.notExists(source)) {
@@ -51,6 +65,17 @@ class CompileTask(
 
     val output: SingleOutput = () => classesDirectory.toFile
 
+    // TODO probably calculate from module before executing task
+    val scalaVersion = context.rootProject.scalaVersion
+
+    val bridgeProvider =
+      DefaultBridgeProvider(scalaVersion, dependencyResolver)
+
+    val scalaCompiler =
+      ScalaCompilerFactory.createScalaCompiler(scalaVersion, bridgeProvider)
+
+    logger.info(s"Compiling ${sources.size} classes ...")
+
     scalaCompiler.compile(
       sources.map(PlainVirtualFile(_)).toArray,
       library.map(PlainVirtualFile(_)).toArray,
@@ -71,25 +96,22 @@ class CompileTask(
         override def problems(): Array[Problem] = Array.empty
 
         override def log(problem: Problem): Unit =
-          println(problem.toString)
+          logger.info(s"P: ${problem.toString}")
 
         override def comment(pos: Position, msg: String): Unit = ()
       },
       Optional.empty(),
-      new Logger {
-        override def error(msg: Supplier[String]): Unit = println(msg.get())
-
-        override def warn(msg: Supplier[String]): Unit = println(msg.get())
-
-        override def info(msg: Supplier[String]): Unit = println(msg.get())
-
-        override def debug(msg: Supplier[String]): Unit = println(msg.get())
-
-        override def trace(exception: Supplier[Throwable]): Unit =
-          println(exception.get().getMessage)
-      }
+      CompilerLoggerAdapter
     )
-    Seq.empty
+
+    logger.info("Compilation done.")
+
+    Files
+      .walk(classesDirectory)
+      .filter(_.endsWith(".class"))
+      .toList
+      .asScala
+      .toSet
   }
 
   // TODO fix calculation
@@ -98,7 +120,16 @@ class CompileTask(
       override def isEmpty: Boolean = false
 
       override def modifiedBinaries(): Array[File] = new Array[File](0)
+
       override def modifiedLibraries(): Array[VirtualFileRef] =
         new Array[VirtualFileRef](0)
+
       override def modifiedClasses(): Array[String] =
         sourceSet.map(_.toString).toArray
+
+}
+
+object CompileTask:
+
+  private lazy val libraryModule =
+    Module(GroupId("org.scala-lang"), ArtifactId("scala-library"))

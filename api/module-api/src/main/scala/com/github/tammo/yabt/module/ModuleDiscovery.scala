@@ -8,4 +8,4 @@ trait ModuleDiscovery:
 
 object ModuleDiscovery:
 
-  case class DiscoveryError(error: String)
+  case class DiscoveryError(message: String, throwable: Throwable)

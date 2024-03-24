@@ -1,5 +1,6 @@
 package com.github.tammo.yabt.task.jvm
 
+import org.slf4j.LoggerFactory
 import xsbti.api.{ClassLike, DependencyContext}
 import xsbti.*
 
@@ -9,6 +10,8 @@ import java.util
 import java.util.Optional
 
 object TestAnalysesCallback extends AnalysisCallback2 {
+
+  private val logger = LoggerFactory.getLogger(getClass)
 
   override def startSource(source: File): Unit = ()
 
@@ -42,7 +45,7 @@ object TestAnalysesCallback extends AnalysisCallback2 {
       binaryClassName: String,
       srcClassName: String
   ): Unit =
-    println(srcClassName)
+    logger.debug(s"Generate non local class deprecated: $srcClassName")
 
   override def generatedNonLocalClass(
       source: VirtualFileRef,
@@ -50,16 +53,16 @@ object TestAnalysesCallback extends AnalysisCallback2 {
       binaryClassName: String,
       srcClassName: String
   ): Unit =
-    println(srcClassName)
+    logger.debug(s"Generate non local class: $srcClassName")
 
   override def generatedLocalClass(source: File, classFile: File): Unit =
-    println(source.getName)
+    logger.debug(s"Generate local class deprecated: ${source.getName}")
 
   override def generatedLocalClass(
       source: VirtualFileRef,
       classFile: Path
   ): Unit =
-    println(source.name())
+    logger.debug(s"Generate local class deprecated: ${source.name()}")
 
   override def api(sourceFile: File, classApi: ClassLike): Unit = ()
 

@@ -1,0 +1,4 @@
+name: test-project
+version: 1.0.0
+organization: com.github.tammo
+scalaVersion: 2.13.12

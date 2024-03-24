@@ -1,7 +1,12 @@
 package com.github.tammo.yabt
 
 import com.github.tammo.yabt.cli.ConsoleCommandLineInterface
-import com.github.tammo.yabt.module.{AppServiceProvider, ClasspathModuleDiscovery}
+import com.github.tammo.yabt.module.{
+  AppServiceProvider,
+  ClasspathModuleDiscovery
+}
+import com.github.tammo.yabt.task.SequentialTaskEvaluator
+import org.slf4j.LoggerFactory
 
 object Main:
 
@@ -10,8 +15,13 @@ object Main:
     ProjectModule.projectResolver,
     ConsoleCommandLineInterface(_),
     ClasspathModuleDiscovery,
-    AppServiceProvider
+    AppServiceProvider,
+    SequentialTaskEvaluator
   )
 
-  def main(args: Array[String]): Unit =
+  private val logger = LoggerFactory.getLogger(Main.getClass)
+
+  def main(args: Array[String]): Unit = {
+    logger.info("Loading project ...")
     coreApplication.readProjectAndExecuteCommand(args)
+  }
