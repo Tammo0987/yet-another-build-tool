@@ -1,8 +1,8 @@
-package com.github.tammo.yabt.task.jvm
+package com.github.tammo.yabt.task.jvm.compile
 
 import org.slf4j.LoggerFactory
-import xsbti.api.{ClassLike, DependencyContext}
 import xsbti.*
+import xsbti.api.{ClassLike, DependencyContext}
 
 import java.io.File
 import java.nio.file.Path
@@ -85,8 +85,8 @@ object TestAnalysesCallback extends AnalysisCallback2 {
       msg: String,
       severity: Severity,
       reported: Boolean
-  ): Unit =
-    println(s"Problem: $msg")
+  ): Unit = ()
+    //println(s"Problem: $msg")
 
   override def dependencyPhaseCompleted(): Unit = ()
 

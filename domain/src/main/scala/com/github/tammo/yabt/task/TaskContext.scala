@@ -7,5 +7,6 @@ import java.nio.file.Path
 case class TaskContext(
     workingDirectory: Path,
     rootProject: ResolvedProject,
-    module: ModuleReference
+    module: ModuleReference,
+    scalaVersion: String // TODO fix this after fixing the modules and projects domain
 )

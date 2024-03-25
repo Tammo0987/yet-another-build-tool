@@ -5,13 +5,7 @@ import com.github.tammo.yabt.dependency.DependencyResolver
 import com.github.tammo.yabt.extensions.PathExtensions.*
 import com.github.tammo.yabt.task.Task.Pure
 import com.github.tammo.yabt.task.TaskDSL.task
-import com.github.tammo.yabt.task.jvm.TestAnalysesCallback
-import com.github.tammo.yabt.task.jvm.compile.{
-  CompilerLoggerAdapter,
-  DefaultBridgeProvider,
-  ScalaCompilerFactory
-}
-import com.github.tammo.yabt.task.jvm.tasks.CompileTask.*
+import com.github.tammo.yabt.task.jvm.compile.*
 import com.github.tammo.yabt.task.{Task, TaskContext}
 import org.slf4j.LoggerFactory
 import sbt.internal.inc.{PlainVirtualFile, PlainVirtualFileConverter}
@@ -25,7 +19,7 @@ import scala.jdk.CollectionConverters.*
 
 class CompileTask(
     private val dependencyResolver: DependencyResolver
-) {
+):
 
   lazy val compileTask: Task[Set[Path]] =
     task("compile", "Compiles all sources of a module") { context =>
@@ -60,7 +54,9 @@ class CompileTask(
 
     val dependencyChanges = makeDependencyChanges(sources)
     val library = dependencyResolver.resolveDependencies(
-      Seq(Dependency(libraryModule, Version("2.13.10")))
+      ScalaVersionUtil
+        .scalaCompilerClasspath(context.scalaVersion)
+        .toSeq
     )
 
     val output: SingleOutput = () => classesDirectory.toFile
@@ -84,22 +80,7 @@ class CompileTask(
       Array.empty,
       output,
       TestAnalysesCallback,
-      new Reporter {
-        override def reset(): Unit = ()
-
-        override def hasErrors: Boolean = false
-
-        override def hasWarnings: Boolean = false
-
-        override def printSummary(): Unit = ()
-
-        override def problems(): Array[Problem] = Array.empty
-
-        override def log(problem: Problem): Unit =
-          logger.info(s"P: ${problem.toString}")
-
-        override def comment(pos: Position, msg: String): Unit = ()
-      },
+      CompilerReporter,
       Optional.empty(),
       CompilerLoggerAdapter
     )
@@ -126,10 +107,3 @@ class CompileTask(
 
       override def modifiedClasses(): Array[String] =
         sourceSet.map(_.toString).toArray
-
-}
-
-object CompileTask:
-
-  private lazy val libraryModule =
-    Module(GroupId("org.scala-lang"), ArtifactId("scala-library"))

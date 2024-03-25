@@ -6,4 +6,6 @@ import java.nio.file.Path
 
 trait DependencyResolver:
 
-  def resolveDependencies(seq: Seq[Dependency]): Seq[Path]
+  def resolveDependencies(seq: Seq[Dependency]): Seq[Path] // TODO probably Set?
+
+  // TODO resolveDependency? with Option type? Or error type?

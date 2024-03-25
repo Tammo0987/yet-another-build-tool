@@ -19,16 +19,37 @@ class DefaultBridgeProvider(
       scalaInstance: ScalaInstance,
       logger: Logger
   ): File = {
-    val bridgeJar = fetchModule(compilerBridge, Version("1.9.6")).head.toFile
+    val scalaOrganization = ScalaVersionUtil.scalaOrganization(scalaVersion)
+    val bridgeDependency: Dependency = scalaVersion match
+      case s"0.$_" =>
+        Dependency(
+          Module(GroupId(scalaOrganization), ArtifactId("dotty-sbt-bridge")),
+          Version(scalaVersion)
+        )
+      case s"3.$_" =>
+        Dependency(
+          Module(GroupId(scalaOrganization), ArtifactId("scala3-sbt-bridge")),
+          Version(scalaVersion)
+        )
+      case _ =>
+        val scalaBinaryVersion =
+          ScalaVersionUtil.scalaBinaryVersion(scalaVersion)
+        Dependency(
+          Module(
+            GroupId("org.scala-sbt"),
+            ArtifactId(s"compiler-bridge_$scalaBinaryVersion")
+          ),
+          Version(ZINC_VERSION)
+        )
 
-    bridgeJar
+    dependencyResolver.resolveDependencies(Seq(bridgeDependency)).head.toFile
   }
 
   override def fetchScalaInstance(
       scalaVersion: String,
       logger: Logger
   ): ScalaInstance = {
-    val loadedCompilerJars = fetchCompiler()
+    val loadedCompilerJars = fetchCompiler() // TODO lazy?
     val loadedLibraryJars = fetchLibrary()
 
     new ScalaInstance:
@@ -64,14 +85,13 @@ class DefaultBridgeProvider(
   }
 
   private def fetchCompiler(): Seq[Path] =
-    fetchModule(compilerModule, Version(scalaVersion))
+    dependencyResolver.resolveDependencies(
+      ScalaVersionUtil.scalaCompilerClasspath(scalaVersion).toSeq
+    )
 
   private def fetchLibrary(): Seq[Path] =
-    fetchModule(libraryModule, Version(scalaVersion))
-
-  private def fetchModule(module: Module, version: Version): Seq[Path] =
     dependencyResolver.resolveDependencies(
-      Seq(Dependency(module, version))
+      ScalaVersionUtil.scalaRuntimeClasspath(scalaVersion).toSeq
     )
 
   private def createClassLoader(paths: Seq[Path]): ClassLoader =
@@ -79,13 +99,5 @@ class DefaultBridgeProvider(
 
 object DefaultBridgeProvider:
 
-  private lazy val compilerBridge: Module = Module(
-    GroupId("org.scala-sbt"),
-    ArtifactId("compiler-bridge_2.13") // TODO version
-  )
-
-  private val compilerModule =
-    Module(GroupId("org.scala-lang"), ArtifactId("scala-compiler"))
-
-  private val libraryModule =
-    Module(GroupId("org.scala-lang"), ArtifactId("scala-library"))
+  // TODO get from build information
+  private val ZINC_VERSION = "1.9.6"

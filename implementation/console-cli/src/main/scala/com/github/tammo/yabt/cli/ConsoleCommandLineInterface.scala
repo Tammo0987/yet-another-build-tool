@@ -12,7 +12,7 @@ class ConsoleCommandLineInterface(
 
   override def processArguments(input: Array[String]): String = {
     if (input.length == 0) {
-      return "invalid input, no command provided"
+      return "Invalid input, no command provided."
     }
 
     val commandName = input(0)
@@ -117,7 +117,7 @@ class ConsoleCommandLineInterface(
           parseArgument(result, next.head, next.tail)
         }
       } else {
-        Left(s"malformed option $current")
+        Left(s"Malformed option $current")
       }
     }
 

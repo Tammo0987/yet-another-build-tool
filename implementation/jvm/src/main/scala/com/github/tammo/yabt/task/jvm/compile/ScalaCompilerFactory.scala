@@ -9,7 +9,7 @@ object ScalaCompilerFactory {
       scalaVersion: String,
       bridgeProvider: CompilerBridgeProvider
   ): ScalaCompiler = {
-    val scalaInstance = bridgeProvider.fetchScalaInstance(scalaVersion, null)
+    val scalaInstance = bridgeProvider.fetchScalaInstance(scalaVersion, null) // todo add logger
     new AnalyzingCompiler(
       scalaInstance = scalaInstance,
       provider = bridgeProvider,

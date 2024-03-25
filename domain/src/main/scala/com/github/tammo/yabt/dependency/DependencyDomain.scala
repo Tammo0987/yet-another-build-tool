@@ -1,6 +1,7 @@
 package com.github.tammo.yabt.dependency
 object DependencyDomain:
 
+  // TODO replace toString with value
   opaque type Version = String
   object Version:
     def apply(version: String): Version = version
@@ -15,5 +16,9 @@ object DependencyDomain:
 
   case class Module(groupId: GroupId, artifactId: ArtifactId)
 
-  case class Dependency(module: Module, version: Version)
+  case class Dependency(module: Module, version: Version) {
 
+    override def toString: String =
+      s"${module.groupId}:${module.artifactId}:$version"
+
+  }

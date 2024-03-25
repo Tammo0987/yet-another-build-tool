@@ -64,7 +64,8 @@ class CoreApplication(
           TaskContext(
             Path.of(""),
             project.getOrElse(null),
-            ModuleReference("/")
+            ModuleReference("/"),
+            project.getOrElse(null).scalaVersion
           )
         )
 
