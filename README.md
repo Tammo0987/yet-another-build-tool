@@ -26,4 +26,4 @@ yabt is licensed under the MIT License. See the [LICENSE](LICENSE) file for deta
 ## Support
 
 If you encounter any issues or have any questions about using yabt, don't hesitate to reach out to us. You
-can [open an issue](https://github.com/yabt/yabt/issues) on GitHub for assistance.
+can [open an issue](https://github.com/Tammo0987/yet-another-build-tool/issues) on GitHub for assistance.
