@@ -42,18 +42,22 @@ class DefaultBridgeProvider(
           Version(ZINC_VERSION)
         )
 
-    dependencyResolver.resolveDependencies(Seq(bridgeDependency)).head.toFile
+    // todo fix error handling
+    dependencyResolver.resolveDependencies(bridgeDependency) match
+      case Left(error) =>
+        throw error.throwable
+      case Right(value) =>
+        value.head.toFile
   }
 
   override def fetchScalaInstance(
       scalaVersion: String,
       logger: Logger
   ): ScalaInstance = {
-    val loadedCompilerJars = fetchCompiler() // TODO lazy?
+    val loadedCompilerJars = fetchCompiler()
     val loadedLibraryJars = fetchLibrary()
 
     new ScalaInstance:
-      // todo binary version?
       override def version(): String = scalaVersion
 
       override def loader(): ClassLoader = createClassLoader(
@@ -85,14 +89,18 @@ class DefaultBridgeProvider(
   }
 
   private def fetchCompiler(): Seq[Path] =
-    dependencyResolver.resolveDependencies(
-      ScalaVersionUtil.scalaCompilerClasspath(scalaVersion).toSeq
-    )
+    dependencyResolver
+      .resolveDependencies(
+        ScalaVersionUtil.scalaCompilerClasspath(scalaVersion).toSeq*
+      )
+      .getOrElse(Seq.empty) // todo fix error handling
 
   private def fetchLibrary(): Seq[Path] =
-    dependencyResolver.resolveDependencies(
-      ScalaVersionUtil.scalaRuntimeClasspath(scalaVersion).toSeq
-    )
+    dependencyResolver
+      .resolveDependencies(
+        ScalaVersionUtil.scalaRuntimeClasspath(scalaVersion).toSeq*
+      )
+      .getOrElse(Seq.empty) // todo fix error handling
 
   private def createClassLoader(paths: Seq[Path]): ClassLoader =
     new URLClassLoader(paths.map(_.toUri.toURL).toArray, null)

@@ -16,7 +16,7 @@ object CleanTask:
 
       Files
         .walk(targetDirectory)
-        .sorted(Comparator.reverseOrder()) // todo necessary?
+        .sorted(Comparator.reverseOrder())
         .forEach(Files.deleteIfExists(_))
 
       Pure(())

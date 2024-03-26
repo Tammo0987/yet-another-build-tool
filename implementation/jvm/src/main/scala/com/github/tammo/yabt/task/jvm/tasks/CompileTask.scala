@@ -54,10 +54,8 @@ class CompileTask(
 
     val dependencyChanges = makeDependencyChanges(sources)
     val library = dependencyResolver.resolveDependencies(
-      ScalaVersionUtil
-        .scalaCompilerClasspath(context.scalaVersion)
-        .toSeq
-    )
+      ScalaVersionUtil.scalaCompilerClasspath(context.scalaVersion).toSeq*
+    ).getOrElse(Seq.empty) // TODO fix error handling
 
     val output: SingleOutput = () => classesDirectory.toFile
 

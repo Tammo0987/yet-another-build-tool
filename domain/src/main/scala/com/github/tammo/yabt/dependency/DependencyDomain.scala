@@ -19,3 +19,5 @@ object DependencyDomain:
 
     override def toString: String =
       s"${module.groupId}:${module.artifactId}:$version"
+
+  case class DependencyResolveError(message: String, throwable: Throwable)
