@@ -11,17 +11,17 @@ import java.io.FileWriter
 import java.nio.file.Paths
 import scala.util.Try
 
-object ResolvedProjectPrinter {
+object ResolvedProjectPrinter:
 
-  private given Encoder[Name] = Encoder.encodeString.contramap(_.toString)
+  private given Encoder[Name] = Encoder.encodeString.contramap(identity)
 
   private given Encoder[Organization] =
-    Encoder.encodeString.contramap(_.toString)
+    Encoder.encodeString.contramap(identity)
 
-  private given Encoder[Version] = Encoder.encodeString.contramap(_.toString)
+  private given Encoder[Version] = Encoder.encodeString.contramap(identity)
 
   private given Encoder[ModuleReference] =
-    Encoder.encodeString.contramap(_.toString)
+    Encoder.encodeString.contramap(identity)
 
   private given Encoder[ResolvedDependency] = deriveEncoder[ResolvedDependency]
 
@@ -30,14 +30,14 @@ object ResolvedProjectPrinter {
   private given Encoder[ResolvedModule] = deriveEncoder[ResolvedModule]
 
   private given KeyEncoder[Name] =
-    KeyEncoder.encodeKeyString.contramap(_.toString)
+    KeyEncoder.encodeKeyString.contramap(identity)
 
   private given Encoder[ResolvedProject] = deriveEncoder[ResolvedProject]
 
   private val yamlPrinter =
     Printer(preserveOrder = true, stringStyle = StringStyle.DoubleQuoted)
 
-  def writeProjectToFile(path: String, project: ResolvedProject): String = {
+  def writeProjectToFile(path: String, project: ResolvedProject): String =
     val fw = FileWriter(path)
 
     Try {
@@ -47,6 +47,3 @@ object ResolvedProjectPrinter {
       e => e.getMessage,
       _ => s"${Paths.get(path).getFileName.toString} has been written"
     )
-  }
-
-}

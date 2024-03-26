@@ -25,11 +25,11 @@ object CoursierDependencyResolver extends DependencyResolver {
   ): Dependency = {
     Dependency(
       Module(
-        Organization(dependency.module.groupId.toString),
-        ModuleName(dependency.module.artifactId.toString),
+        Organization(dependency.module.groupId),
+        ModuleName(dependency.module.artifactId),
         Map.empty
       ),
-      dependency.version.toString
+      dependency.version
     )
   }
 

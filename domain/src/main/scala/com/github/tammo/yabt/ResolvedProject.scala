@@ -2,19 +2,19 @@ package com.github.tammo.yabt
 
 object ResolvedProject {
 
-  opaque type Name = String
+  opaque type Name <: String = String
   object Name:
     def apply(string: String): Name = string
 
-  opaque type Version = String
+  opaque type Version <: String = String
   object Version:
     def apply(string: String): Version = string
 
-  opaque type Organization = String
+  opaque type Organization <: String = String
   object Organization:
     def apply(string: String): Organization = string
 
-  opaque type ModuleReference = String
+  opaque type ModuleReference <: String = String
   object ModuleReference:
     def apply(string: String): ModuleReference = string
 
