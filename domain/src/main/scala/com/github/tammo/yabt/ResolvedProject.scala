@@ -1,6 +1,6 @@
 package com.github.tammo.yabt
 
-object ResolvedProject {
+object ResolvedProject:
 
   opaque type Name <: String = String
   object Name:
@@ -18,13 +18,13 @@ object ResolvedProject {
   object ModuleReference:
     def apply(string: String): ModuleReference = string
 
-  // TODO same as module?
   case class ResolvedProject(
       name: Name,
       organization: Organization,
       version: Version,
       scalaVersion: String,
       plugins: Set[String],
+      dependencies: Set[ResolvedDependency],
       modules: Map[Name, ResolvedModule]
   )
 
@@ -47,9 +47,6 @@ object ResolvedProject {
       scope: Scope
   )
 
-  enum Scope {
+  enum Scope:
     case Compile
     case Test
-  }
-
-}

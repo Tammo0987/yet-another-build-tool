@@ -7,7 +7,7 @@ import com.github.tammo.yabt.ResolvedProject.*
 import com.github.tammo.yabt.extensions.SetExtensions.liftToEither
 
 class DefaultProjectResolver(private val projectReader: ProjectReader)
-    extends ProjectResolver {
+    extends ProjectResolver:
 
   private val ROOT = "build"
 
@@ -23,7 +23,7 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
   private def combineModuleIncludesRecursive(
       resolvableModule: Either[ResolveError, ResolvableModule],
       path: Seq[String]
-  ): Either[ResolveError, ResolvableModule] = {
+  ): Either[ResolveError, ResolvableModule] =
     for {
       module <- resolvableModule
 
@@ -40,24 +40,21 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
         resolvedModules
       )
     } yield module ++ combinedResolvableModule
-  }
 
   private def checkCyclesAndResolveModuleInclude(
       include: String,
       path: Seq[String]
-  ): Either[ResolveError, ResolvableModule] = {
-    if (include == ROOT) {
+  ): Either[ResolveError, ResolvableModule] =
+    if (include == ROOT)
       Left(IllegalRootReference(path))
-    } else if (path.contains(include)) {
+    else if (path.contains(include))
       Left(CyclicReference(path :+ include))
-    } else {
+    else
       projectReader.readModuleInclude(s"$include.yaml")
-    }
-  }
 
   private def combineModulesIncludes(
       includes: Seq[Either[ResolveError, ResolvableModule]]
-  ): Either[ResolveError, ResolvableModule] = {
+  ): Either[ResolveError, ResolvableModule] =
     includes
       .foldLeft[Either[ResolveError, ResolvableModule]](
         Right(ResolvableModule())
@@ -67,11 +64,10 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
           b <- s
         } yield b ++ a
       )
-  }
 
   private def readModuleIncludes(
       modules: Set[ResolvableModule]
-  ): Either[ResolveError, Map[Name, ResolvedModule]] = {
+  ): Either[ResolveError, Map[Name, ResolvedModule]] =
     modules
       .map { module =>
         combineModuleIncludesRecursive(Right(module), Seq(ROOT))
@@ -85,11 +81,10 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       .flatMap { map =>
         map.view.mapValues(resolveModules).toMap.liftToEither()
       }
-  }
 
   private def resolveModules(
       module: ResolvableModule
-  ): Either[ResolveError, ResolvedModule] = {
+  ): Either[ResolveError, ResolvedModule] =
     for {
       name <- module.name.map(Name.apply).toRight(MissingField("name"))
       organization <- module.organization
@@ -113,7 +108,6 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       module.aggregates.map(ModuleReference.apply),
       module.plugins
     )
-  }
 
   private def resolveProject(
       resolvableProject: ResolvableProject,
@@ -125,6 +119,7 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       Version(resolvableProject.version),
       resolvableProject.scalaVersion,
       resolvableProject.plugins,
+      Set.empty,
       modules
     )
   )
@@ -139,4 +134,3 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
         case ResolvableScope.Test    => Scope.Test
     )
 
-}

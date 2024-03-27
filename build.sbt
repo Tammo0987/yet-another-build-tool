@@ -29,7 +29,9 @@ lazy val scalaModule: Seq[Setting[?]] = yabtModule ++ Seq(
     "-Wunused:params",
     "-Wunused:privates",
     "-Xfatal-warnings",
-    "-Ysafe-init"
+    "-Ysafe-init",
+    "-rewrite",
+    "-indent"
   )
 )
 

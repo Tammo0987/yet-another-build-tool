@@ -13,12 +13,11 @@ object ClasspathModuleDiscovery extends ModuleDiscovery:
 
   override def discoverModules: Either[DiscoveryError, Set[Module]] =
     loadClassesInPackage(YABT_PACKAGE, getClass.getClassLoader)
-      .flatMap {
+      .flatMap:
         _.filter(classOf[Module].isAssignableFrom(_))
           .filter(x => x != classOf[Module])
           .map(loadModule)
           .liftToEither()
-      }
 
   private def loadClassesInPackage(
       packageName: String,

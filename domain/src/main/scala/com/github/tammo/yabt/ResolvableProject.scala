@@ -2,8 +2,9 @@ package com.github.tammo.yabt
 
 import scala.annotation.targetName
 
-object ResolvableProject {
+object ResolvableProject:
 
+  // TODO types?
   case class ResolvableProject(
       reference: String = "1",
       name: String,
@@ -25,10 +26,10 @@ object ResolvableProject {
       aggregates: Set[String] = Set.empty,
       plugins: Set[String] = Set.empty,
       includes: Seq[String] = Seq.empty
-  ) {
+  ):
 
     @targetName("combine")
-    def ++(other: ResolvableModule): ResolvableModule = {
+    def ++(other: ResolvableModule): ResolvableModule =
       ResolvableModule(
         name.orElse(other.name),
         version.orElse(other.version),
@@ -41,9 +42,7 @@ object ResolvableProject {
         plugins ++ other.plugins,
         includes ++ other.includes
       )
-    }
 
-  }
 
   case class Dependency(
       organization: String,
@@ -52,9 +51,7 @@ object ResolvableProject {
       scope: Scope = Scope.Compile
   )
 
-  enum Scope {
+  enum Scope:
     case Compile
     case Test
-  }
 
-}
