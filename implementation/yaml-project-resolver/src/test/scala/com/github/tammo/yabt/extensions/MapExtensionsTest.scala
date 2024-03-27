@@ -4,36 +4,31 @@ import com.github.tammo.yabt.extensions.MapExtensions.liftToEither
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers
 
-class MapExtensionsTest extends AnyFlatSpecLike with Matchers {
+class MapExtensionsTest extends AnyFlatSpecLike with Matchers:
 
-  it should "lift empty map to right of empty map" in {
+  it should "lift empty map to right of empty map" in:
     val map: Map[Int, Either[String, Int]] = Map.empty
 
     map.liftToEither() shouldBe Right(Map.empty)
-  }
 
-  it should "lift map with only right values to map with the same values" in {
+  it should "lift map with only right values to map with the same values" in:
     val map: Map[Int, Either[String, Int]] = Map(
       1 -> Right(1),
       2 -> Right(2)
     )
 
     map.liftToEither() shouldBe Right(Map(1 -> 1, 2 -> 2))
-  }
 
-  it should "lift map with left to left with the same value" in {
+  it should "lift map with left to left with the same value" in:
     val map: Map[Int, Either[String, Int]] =
       Map(1 -> Left("error"))
 
     map.liftToEither() shouldBe Left("error")
-  }
 
-  it should "lift map with left and right to left" in {
+  it should "lift map with left and right to left" in:
     val map: Map[Int, Either[String, Int]] =
       Map(1 -> Right(1), 2 -> Left("error"))
 
     map.liftToEither() shouldBe Left("error")
 
-  }
 
-}
