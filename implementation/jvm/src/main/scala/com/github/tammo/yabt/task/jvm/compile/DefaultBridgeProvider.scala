@@ -42,10 +42,11 @@ class DefaultBridgeProvider(
           Version(ZINC_VERSION)
         )
 
-    // todo fix error handling
     dependencyResolver.resolveDependencies(bridgeDependency) match
       case Left(error) =>
         throw error.throwable
+      case Right(Nil) =>
+        throw new RuntimeException("Can't resolve compiler bridge")
       case Right(value) =>
         value.head.toFile
 
@@ -53,10 +54,10 @@ class DefaultBridgeProvider(
       scalaVersion: String,
       logger: Logger
   ): ScalaInstance =
-    val loadedCompilerJars = fetchCompiler()
-    val loadedLibraryJars = fetchLibrary()
-
-    new ScalaInstance:
+    val errorOrInstance = for {
+      loadedCompilerJars <- fetchCompiler()
+      loadedLibraryJars <- fetchLibrary()
+    } yield new ScalaInstance:
       override def version(): String = scalaVersion
 
       override def loader(): ClassLoader = createClassLoader(
@@ -86,19 +87,23 @@ class DefaultBridgeProvider(
 
       override def actualVersion(): String = scalaVersion
 
-  private def fetchCompiler(): Seq[Path] =
+    errorOrInstance match
+      case Left(error) =>
+        throw error.throwable
+      case Right(scalaInstance) =>
+        scalaInstance
+
+  private def fetchCompiler(): Either[DependencyResolveError, Seq[Path]] =
     dependencyResolver
       .resolveDependencies(
         ScalaVersionUtil.scalaCompilerClasspath(scalaVersion).toSeq*
       )
-      .getOrElse(Seq.empty) // todo fix error handling
 
-  private def fetchLibrary(): Seq[Path] =
+  private def fetchLibrary(): Either[DependencyResolveError, Seq[Path]] =
     dependencyResolver
       .resolveDependencies(
         ScalaVersionUtil.scalaRuntimeClasspath(scalaVersion).toSeq*
       )
-      .getOrElse(Seq.empty) // todo fix error handling
 
   private def createClassLoader(paths: Seq[Path]): ClassLoader =
     new URLClassLoader(paths.map(_.toUri.toURL).toArray, null)

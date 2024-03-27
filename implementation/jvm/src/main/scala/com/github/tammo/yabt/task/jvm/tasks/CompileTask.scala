@@ -53,7 +53,7 @@ class CompileTask(
     val dependencyChanges = makeDependencyChanges(sources)
     val library = dependencyResolver.resolveDependencies(
       ScalaVersionUtil.scalaCompilerClasspath(context.scalaVersion).toSeq*
-    ).getOrElse(Seq.empty) // TODO fix error handling
+    ).getOrElse(Seq.empty) // TODO fix error handling after reworked task evaluation
 
     val output: SingleOutput = () => classesDirectory.toFile
 
@@ -90,7 +90,7 @@ class CompileTask(
       .asScala
       .toSet
 
-  // TODO fix calculation
+  // TODO fix calculation; currently recompile everything every time.
   private def makeDependencyChanges(sourceSet: Set[Path]): DependencyChanges =
     new DependencyChanges:
       override def isEmpty: Boolean = false
