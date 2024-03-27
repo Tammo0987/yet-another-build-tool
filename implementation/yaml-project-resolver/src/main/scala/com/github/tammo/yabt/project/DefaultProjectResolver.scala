@@ -1,6 +1,6 @@
 package com.github.tammo.yabt.project
 
-import com.github.tammo.yabt.Error.*
+import com.github.tammo.yabt.Resolve.*
 import com.github.tammo.yabt.ResolvableProject.{Scope as ResolvableScope, *}
 import com.github.tammo.yabt.ResolvedProject.*
 import com.github.tammo.yabt.ResolvedProject.Module.ResolvedModule

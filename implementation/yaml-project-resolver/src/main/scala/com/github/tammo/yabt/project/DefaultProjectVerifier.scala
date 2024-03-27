@@ -1,10 +1,10 @@
 package com.github.tammo.yabt.project
 
-import com.github.tammo.yabt.Error.*
+import com.github.tammo.yabt.Resolve.*
 import com.github.tammo.yabt.ResolvedProject.*
 import com.github.tammo.yabt.extensions.MapExtensions.liftToEither
 import com.github.tammo.yabt.extensions.SetExtensions.liftToEither
-import com.github.tammo.yabt.{Error, ResolvedProject}
+import com.github.tammo.yabt.{Resolve, ResolvedProject}
 
 object DefaultProjectVerifier extends ProjectVerifier:
 

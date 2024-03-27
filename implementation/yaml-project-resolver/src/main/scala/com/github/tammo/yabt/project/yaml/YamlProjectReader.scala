@@ -1,7 +1,7 @@
 package com.github.tammo.yabt.project.yaml
 
-import com.github.tammo.yabt.Error.ReadError.*
-import com.github.tammo.yabt.Error.ResolveError
+import com.github.tammo.yabt.Resolve.ReadError.*
+import com.github.tammo.yabt.Resolve.ResolveError
 import com.github.tammo.yabt.ResolvableProject
 import com.github.tammo.yabt.ResolvableProject.{
   ResolvableModule,

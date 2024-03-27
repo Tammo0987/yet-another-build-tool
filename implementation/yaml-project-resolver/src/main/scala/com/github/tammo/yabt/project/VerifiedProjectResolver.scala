@@ -1,9 +1,9 @@
 package com.github.tammo.yabt.project
 
-import com.github.tammo.yabt.Error.ResolveError
+import com.github.tammo.yabt.Resolve.ResolveError
 import com.github.tammo.yabt.ResolvableProject.ResolvableProject
 import com.github.tammo.yabt.ResolvedProject.ResolvedProject
-import com.github.tammo.yabt.{Error, ResolvableProject, ResolvedProject}
+import com.github.tammo.yabt.{Resolve, ResolvableProject, ResolvedProject}
 
 trait VerifiedProjectResolver extends ProjectResolver:
 

@@ -1,6 +1,6 @@
 package com.github.tammo.yabt.project
 
-import com.github.tammo.yabt.Error.{CyclicReference, MissingReference}
+import com.github.tammo.yabt.Resolve.{CyclicReference, MissingReference}
 import com.github.tammo.yabt.ResolvedProject.*
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers

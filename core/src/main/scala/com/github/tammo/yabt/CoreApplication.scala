@@ -1,7 +1,7 @@
 package com.github.tammo.yabt
 
-import com.github.tammo.yabt.Error.*
-import com.github.tammo.yabt.Error.ReadError.*
+import com.github.tammo.yabt.Resolve.*
+import com.github.tammo.yabt.Resolve.ReadError.*
 import com.github.tammo.yabt.cli.CommandLineInterface
 import com.github.tammo.yabt.command.CommandDomain.Command
 import com.github.tammo.yabt.module.ModuleDiscovery

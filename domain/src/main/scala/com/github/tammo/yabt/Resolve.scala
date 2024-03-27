@@ -1,7 +1,7 @@
 package com.github.tammo.yabt
 
 // TODO rename
-object Error:
+object Resolve:
 
   sealed trait ResolveError
 
