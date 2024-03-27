@@ -12,6 +12,7 @@ object ResolvableProject:
       organization: String,
       scalaVersion: String,
       plugins: Set[String] = Set.empty,
+      dependencies: Set[Dependency] = Set.empty,
       modules: Map[String, ResolvableModule] = Map.empty
   )
 
@@ -42,7 +43,6 @@ object ResolvableProject:
         plugins ++ other.plugins,
         includes ++ other.includes
       )
-
 
   case class Dependency(
       organization: String,

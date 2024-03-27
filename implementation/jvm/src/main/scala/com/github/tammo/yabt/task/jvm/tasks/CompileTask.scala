@@ -68,11 +68,27 @@ class CompileTask(
     val scalaCompiler =
       ScalaCompilerFactory.createScalaCompiler(scalaVersion, bridgeProvider)
 
+    logger.info(s"Fetching dependencies ...")
+
+    val dependencies = context.module.dependencies.toSeq.map(dependency =>
+      Dependency(
+        Module(GroupId(dependency.organization), ArtifactId(dependency.name)),
+        Version(dependency.version)
+      )
+    )
+    // TODO fix error handling after task evaluation
+    val dependencyPaths =
+      dependencyResolver.resolveDependencies(dependencies*) match
+        case Left(error) =>
+          throw new RuntimeException(error.message, error.throwable)
+        case Right(dependencies) =>
+          dependencies
+
     logger.info(s"Compiling ${sources.size} classes ...")
 
     scalaCompiler.compile(
       sources.map(PlainVirtualFile(_)).toArray,
-      library.map(PlainVirtualFile(_)).toArray,
+      (library ++ dependencyPaths).map(PlainVirtualFile(_)).toArray,
       PlainVirtualFileConverter(),
       dependencyChanges,
       Array.empty,

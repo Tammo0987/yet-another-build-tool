@@ -120,7 +120,7 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       Version(resolvableProject.version),
       resolvableProject.scalaVersion,
       resolvableProject.plugins,
-      Set.empty,
+      resolvableProject.dependencies.map(mapDependency),
       Set.empty,
       Set.empty,
       modules
