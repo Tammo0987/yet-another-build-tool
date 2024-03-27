@@ -3,12 +3,12 @@ package com.github.tammo.yabt.task.jvm.compile
 import sbt.internal.inc.AnalyzingCompiler
 import xsbti.compile.{ClasspathOptions, CompilerBridgeProvider, ScalaCompiler}
 
-object ScalaCompilerFactory {
+object ScalaCompilerFactory:
 
   def createScalaCompiler(
       scalaVersion: String,
       bridgeProvider: CompilerBridgeProvider
-  ): ScalaCompiler = {
+  ): ScalaCompiler =
     val scalaInstance =
       bridgeProvider.fetchScalaInstance(scalaVersion, CompilerLoggerAdapter)
     new AnalyzingCompiler(
@@ -19,6 +19,4 @@ object ScalaCompilerFactory {
       onArgsHandler = println,
       classLoaderCache = None
     )
-  }
 
-}

@@ -9,7 +9,7 @@ trait LoggedTaskEvaluator extends TaskEvaluator:
 
   abstract override def evaluateTask[T](task: Task[T])(using
       ctx: TaskContext
-  ): Task.Result[T] = {
+  ): Task.Result[T] =
     val result = super.evaluateTask(task)
 
     result match
@@ -23,4 +23,3 @@ trait LoggedTaskEvaluator extends TaskEvaluator:
         logger.info(s"Skipped task.")
 
     result
-  }

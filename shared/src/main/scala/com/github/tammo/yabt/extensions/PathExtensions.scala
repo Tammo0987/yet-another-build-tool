@@ -5,7 +5,7 @@ import scala.annotation.targetName
 
 object PathExtensions:
 
-  extension (path: Path) {
+  extension (path: Path)
 
     @targetName("slash")
     def /(subPath: Path): Path = path.resolve(subPath)
@@ -13,4 +13,3 @@ object PathExtensions:
     @targetName("slash")
     def /(subPath: String): Path = /(Path.of(subPath))
 
-  }

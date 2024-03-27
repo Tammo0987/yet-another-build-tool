@@ -9,7 +9,7 @@ import java.nio.file.Path
 import java.util
 import java.util.Optional
 
-object TestAnalysesCallback extends AnalysisCallback2 {
+object TestAnalysesCallback extends AnalysisCallback2:
 
   private val logger = LoggerFactory.getLogger(getClass)
 
@@ -111,4 +111,3 @@ object TestAnalysesCallback extends AnalysisCallback2 {
       diagnosticRelatedInformation: util.List[DiagnosticRelatedInformation],
       actions: util.List[Action]
   ): Unit = ()
-}

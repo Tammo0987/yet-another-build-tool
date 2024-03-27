@@ -4,10 +4,9 @@ import com.github.tammo.yabt.Error.ResolveError
 import com.github.tammo.yabt.ResolvableProject.ResolvableProject
 import com.github.tammo.yabt.ResolvedProject.ResolvedProject
 
-trait ProjectResolver {
+trait ProjectResolver:
 
   def resolveProject(
       resolvableProject: ResolvableProject
   ): Either[ResolveError, ResolvedProject]
 
-}

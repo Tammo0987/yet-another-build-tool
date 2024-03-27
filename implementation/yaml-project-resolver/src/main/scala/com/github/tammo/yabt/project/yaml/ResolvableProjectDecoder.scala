@@ -7,7 +7,7 @@ import io.circe.derivation.{Configuration, ConfiguredDecoder}
 
 import scala.util.Try
 
-object ResolvableProjectDecoder {
+object ResolvableProjectDecoder:
 
   given Configuration = Configuration.default.withDefaults
 
@@ -29,4 +29,3 @@ object ResolvableProjectDecoder {
     }
   }
 
-}

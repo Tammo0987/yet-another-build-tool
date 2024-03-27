@@ -18,7 +18,7 @@ class DefaultBridgeProvider(
   override def fetchCompiledBridge(
       scalaInstance: ScalaInstance,
       logger: Logger
-  ): File = {
+  ): File =
     val scalaOrganization = ScalaVersionUtil.scalaOrganization(scalaVersion)
     val bridgeDependency: Dependency = scalaVersion match
       case s"0.$_" =>
@@ -48,12 +48,11 @@ class DefaultBridgeProvider(
         throw error.throwable
       case Right(value) =>
         value.head.toFile
-  }
 
   override def fetchScalaInstance(
       scalaVersion: String,
       logger: Logger
-  ): ScalaInstance = {
+  ): ScalaInstance =
     val loadedCompilerJars = fetchCompiler()
     val loadedLibraryJars = fetchLibrary()
 
@@ -86,7 +85,6 @@ class DefaultBridgeProvider(
       override def allJars(): Array[File] = compilerJars ++ libraryJars
 
       override def actualVersion(): String = scalaVersion
-  }
 
   private def fetchCompiler(): Seq[Path] =
     dependencyResolver

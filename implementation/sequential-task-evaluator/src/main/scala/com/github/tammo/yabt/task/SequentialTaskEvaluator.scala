@@ -26,24 +26,21 @@ object SequentialTaskEvaluator extends TaskEvaluator:
 
   private def evaluateFlatMapped[F, S](
       flatMapped: FlatMapped[F, S]
-  )(using taskContext: TaskContext): Result[S] = {
+  )(using taskContext: TaskContext): Result[S] =
     evaluateTask(flatMapped.in) match
       case Success(value) => evaluateTask(flatMapped.f(value))
       case _              => Skipped
-  }
 
   private def evaluateJoin[T, F, S](
       join: Join[T, F, S]
-  )(using taskContext: TaskContext): Result[T] = {
+  )(using taskContext: TaskContext): Result[T] =
     val Join(first, second, f) = join
     (evaluateTask(first), evaluateTask(second)) match
       case (Success(a), Success(b)) => evaluateTask(f(a, b))
       case _                        => Skipped
-  }
 
   private def evaluateDependsOn[F, T](
       dependsOn: DependsOn[F, T]
-  )(using taskContext: TaskContext): Result[T] = {
+  )(using taskContext: TaskContext): Result[T] =
     evaluateTask(dependsOn.taskDependency)
     evaluateComputation(dependsOn.task.computation(taskContext))
-  }

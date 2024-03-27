@@ -2,7 +2,7 @@ package com.github.tammo.yabt.task
 
 import com.github.tammo.yabt.task.Task.*
 
-object TaskDSL {
+object TaskDSL:
 
   def taskB[T](name: String, description: String)(f: TaskContext => T): Task[T] =
     Task(Info(name, description), f.andThen(g => Compute(() => g)))
@@ -23,11 +23,9 @@ object TaskDSL {
   ): Computation[S] =
     FlatMapped[F, S](first, f => second(f))
 
-  extension [T](task: Task[T]) {
+  extension [T](task: Task[T])
 
     // TODO move to domain?
     def dependsOn[B](other: Task[B]): Task[T] =
       Task(task.info, _ => DependsOn(task, other))
 
-  }
-}

@@ -4,7 +4,7 @@ import com.github.tammo.yabt.dependency.DependencyDomain.*
 
 object ScalaVersionUtil:
 
-  def scalaCompilerClasspath(scalaVersion: String): Set[Dependency] = {
+  def scalaCompilerClasspath(scalaVersion: String): Set[Dependency] =
     val groupId = GroupId(scalaOrganization(scalaVersion))
     val version = Version(scalaVersion)
     scalaVersion match
@@ -19,9 +19,8 @@ object ScalaVersionUtil:
           Dependency(Module(groupId, ArtifactId("scala-compiler")), version),
           Dependency(Module(groupId, ArtifactId("scala-reflect")), version)
         )
-  }
 
-  def scalaRuntimeClasspath(scalaVersion: String): Set[Dependency] = {
+  def scalaRuntimeClasspath(scalaVersion: String): Set[Dependency] =
     val groupId = GroupId(scalaOrganization(scalaVersion))
     val version = Version(scalaVersion)
     scalaVersion match
@@ -33,7 +32,6 @@ object ScalaVersionUtil:
         )
       case _ =>
         Set(Dependency(Module(groupId, ArtifactId("scala-library")), version))
-  }
 
   def scalaBinaryVersion(scalaVersion: String): String = scalaVersion match
     case s"0.$minor.$_" => s"0.$minor"

@@ -21,11 +21,11 @@ class CoreApplication(
     private val moduleDiscovery: ModuleDiscovery,
     private val serviceProvider: ServiceProvider,
     private val taskEvaluator: TaskEvaluator
-) {
+):
 
   private lazy val logger = LoggerFactory.getLogger(getClass)
 
-  def readProjectAndExecuteCommand(input: Array[String]): Unit = {
+  def readProjectAndExecuteCommand(input: Array[String]): Unit =
     val project = for {
       project <- projectReader.readProject()
       resolvedProject <- projectResolver.resolveProject(project)
@@ -70,7 +70,6 @@ class CoreApplication(
         )
 
         logger.info(commandLineInterface.processArguments(input))
-  }
 
   private def logResolveError(error: ResolveError): Unit = error match
     case FileError(message, underlying) =>
@@ -88,4 +87,3 @@ class CoreApplication(
     case CyclicReference(path) =>
       logger.error(s"Cyclic reference found: ${path.mkString(" / ")}")
 
-}

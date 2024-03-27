@@ -17,7 +17,7 @@ object CompilerReporter extends Reporter:
 
   override def problems(): Array[Problem] = Array.empty
 
-  override def log(problem: Problem): Unit = {
+  override def log(problem: Problem): Unit =
     problem.severity() match
       case Severity.Info =>
         logger.info(problem.message())
@@ -26,6 +26,5 @@ object CompilerReporter extends Reporter:
       case Severity.Error =>
         logger.error(problem.position().toString)
         logger.error(problem.message())
-  }
 
   override def comment(pos: Position, msg: String): Unit = ()

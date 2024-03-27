@@ -14,7 +14,7 @@ import io.circe.{Decoder, Json, yaml}
 import java.io.FileReader
 import scala.util.Try
 
-class YamlProjectReader extends ProjectReader {
+class YamlProjectReader extends ProjectReader:
 
   private val buildFilePath = "build.yaml"
 
@@ -28,7 +28,7 @@ class YamlProjectReader extends ProjectReader {
 
   private def readYamlFile[T: Decoder](
       location: String
-  ): Either[ResolveError, T] = {
+  ): Either[ResolveError, T] =
     val readFile = Try {
       new FileReader(location)
     }.toEither.left.map(throwable =>
@@ -41,7 +41,6 @@ class YamlProjectReader extends ProjectReader {
     readFile
       .flatMap(parseYaml)
       .flatMap(decodeYaml[T])
-  }
 
   private def parseYaml(fileReader: FileReader): Either[ResolveError, Json] =
     yaml.parser
@@ -57,4 +56,3 @@ class YamlProjectReader extends ProjectReader {
       .left
       .map(error => DecodingError(error.message, error.pathToRootString))
 
-}

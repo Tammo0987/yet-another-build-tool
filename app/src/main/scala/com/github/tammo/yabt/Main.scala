@@ -21,7 +21,6 @@ object Main:
 
   private val logger = LoggerFactory.getLogger(Main.getClass)
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     logger.info("Loading project ...")
     coreApplication.readProjectAndExecuteCommand(args)
-  }

@@ -5,7 +5,7 @@ import com.github.tammo.yabt.ResolvableProject.ResolvableProject
 import com.github.tammo.yabt.ResolvedProject.ResolvedProject
 import com.github.tammo.yabt.{Error, ResolvableProject, ResolvedProject}
 
-trait VerifiedProjectResolver extends ProjectResolver {
+trait VerifiedProjectResolver extends ProjectResolver:
 
   def projectVerifier: ProjectVerifier
 
@@ -16,4 +16,3 @@ trait VerifiedProjectResolver extends ProjectResolver {
     verifiedProject <- projectVerifier.verifyProject(resolvedProject)
   } yield verifiedProject
 
-}

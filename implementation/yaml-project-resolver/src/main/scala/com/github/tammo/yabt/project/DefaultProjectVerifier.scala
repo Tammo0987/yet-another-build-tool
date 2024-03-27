@@ -6,7 +6,7 @@ import com.github.tammo.yabt.extensions.MapExtensions.liftToEither
 import com.github.tammo.yabt.extensions.SetExtensions.liftToEither
 import com.github.tammo.yabt.{Error, ResolvedProject}
 
-object DefaultProjectVerifier extends ProjectVerifier {
+object DefaultProjectVerifier extends ProjectVerifier:
 
   override def verifyProject(
       project: ResolvedProject
@@ -63,16 +63,16 @@ object DefaultProjectVerifier extends ProjectVerifier {
   private def verifyNoCyclesInModuleReference(
       project: ResolvedProject,
       referenceExtractor: ResolvedModule => Set[ModuleReference]
-  ): Either[ResolveError, ResolvedProject] = {
+  ): Either[ResolveError, ResolvedProject] =
 
     def findCycles(
         current: ResolvedModule,
         path: Seq[String]
-    ): Either[ResolveError, ResolvedProject] = {
+    ): Either[ResolveError, ResolvedProject] =
       val references = referenceExtractor(current)
-      if (references.isEmpty) {
+      if (references.isEmpty)
         Right(project)
-      } else {
+      else
         references
           .map(module => {
             val resolvedModule = project.modules(Name(module))
@@ -84,14 +84,10 @@ object DefaultProjectVerifier extends ProjectVerifier {
           })
           .liftToEither()
           .map(_ => project)
-      }
-    }
 
     project.modules.view
       .mapValues(module => findCycles(module, Seq.empty))
       .toMap
       .liftToEither()
       .flatMap(_ => Right(project))
-  }
 
-}

@@ -28,7 +28,7 @@ class CompileTask(
 
   private val logger = LoggerFactory.getLogger(getClass)
 
-  private def compile(context: TaskContext): Set[Path] = {
+  private def compile(context: TaskContext): Set[Path] =
     val moduleDirectory =
       context.workingDirectory /// context.module.toString // TODO fix module access
     val source =
@@ -36,13 +36,11 @@ class CompileTask(
 
     val classesDirectory = moduleDirectory / "target" / "classes"
 
-    if (Files.notExists(source)) {
+    if (Files.notExists(source))
       Files.createDirectories(source)
-    }
 
-    if (Files.notExists(classesDirectory)) {
+    if (Files.notExists(classesDirectory))
       Files.createDirectories(classesDirectory)
-    }
 
     val sources = Files
       .walk(source)
@@ -91,7 +89,6 @@ class CompileTask(
       .toList
       .asScala
       .toSet
-  }
 
   // TODO fix calculation
   private def makeDependencyChanges(sourceSet: Set[Path]): DependencyChanges =

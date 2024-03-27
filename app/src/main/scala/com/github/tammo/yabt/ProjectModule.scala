@@ -3,7 +3,7 @@ package com.github.tammo.yabt
 import com.github.tammo.yabt.project.*
 import com.github.tammo.yabt.project.yaml.YamlProjectReader
 
-object ProjectModule {
+object ProjectModule:
 
   val projectReader: ProjectReader = new YamlProjectReader
 
@@ -11,4 +11,3 @@ object ProjectModule {
 
   val projectVerifier: ProjectVerifier = DefaultProjectVerifier
 
-}

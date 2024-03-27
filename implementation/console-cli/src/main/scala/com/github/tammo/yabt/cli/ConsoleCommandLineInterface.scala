@@ -10,10 +10,9 @@ class ConsoleCommandLineInterface(
     private val registeredCommands: Set[Command[?]]
 ) extends CommandLineInterface:
 
-  override def processArguments(input: Array[String]): String = {
-    if (input.length == 0) {
+  override def processArguments(input: Array[String]): String =
+    if (input.length == 0)
       return "Invalid input, no command provided."
-    }
 
     val commandName = input(0)
     val arguments = input.toSeq.tail
@@ -34,20 +33,19 @@ class ConsoleCommandLineInterface(
           case CommandExecutionResult.Success =>
             s"successfully executed command $commandName"
           case CommandExecutionResult.Error => s"Execution error"
-  }
 
   private def validateCommandArgument[T](
       command: Command[T],
       arguments: Seq[String]
-  ): Either[String, T] = {
+  ): Either[String, T] =
 
     @tailrec
     def parseArgument(
         last: Either[String, T],
         current: String,
         next: Seq[String]
-    ): Either[String, T] = {
-      if (current.startsWith("--")) {
+    ): Either[String, T] =
+      if (current.startsWith("--"))
         val parsedOption = parseOption(current, next.headOption.getOrElse(""))
 
         val name = parsedOption.name
@@ -57,7 +55,7 @@ class ConsoleCommandLineInterface(
         val result = option
           .filter(_ => !parsedOption.spaceSeparated || next.nonEmpty)
           .toRight(s"Unknown parameter: $name")
-          .flatMap {
+          .flatMap:
             case Flag(_, _, _, validate, construct) =>
               last.flatMap { x =>
                 Try(value.toBoolean).toEither.left
@@ -79,22 +77,18 @@ class ConsoleCommandLineInterface(
                   .flatMap(validate)
                   .map(construct(x, _))
               }
-          }
 
-        if (parsedOption.spaceSeparated) {
-          if (next.tail.isEmpty) {
+        if (parsedOption.spaceSeparated)
+          if (next.tail.isEmpty)
             result
-          } else {
+          else
             parseArgument(result, next.tail.head, next.tail.tail)
-          }
-        } else {
-          if (next.isEmpty) {
+        else
+          if (next.isEmpty)
             result
-          } else {
+          else
             parseArgument(result, next.head, next.tail)
-          }
-        }
-      } else if (current.startsWith("-") && current.length == 2) {
+      else if (current.startsWith("-") && current.length == 2)
         val flagName = current.slice(1, current.length)
         val option = command.options.find(_.name == flagName)
 
@@ -111,25 +105,20 @@ class ConsoleCommandLineInterface(
             }
           }
 
-        if (next.isEmpty) {
+        if (next.isEmpty)
           result
-        } else {
+        else
           parseArgument(result, next.head, next.tail)
-        }
-      } else {
+      else
         Left(s"Malformed option $current")
-      }
-    }
 
     parseArgument(Right(command.default), arguments.head, arguments.tail)
-  }
 
   private val equalRegex = "(\\w+)=(\\w+)".r
   private def parseOption(current: String, next: String): ParsedOption =
-    current.slice(2, current.length) match {
+    current.slice(2, current.length) match
       case equalRegex(name, value) => ParsedOption(name, value, false)
       case other                   => ParsedOption(other, next, true)
-    }
 
   private case class ParsedOption(
       name: String,

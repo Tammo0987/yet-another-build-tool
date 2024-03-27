@@ -6,10 +6,9 @@ import com.github.tammo.yabt.ResolvableProject.{
   ResolvableProject
 }
 
-trait ProjectReader {
+trait ProjectReader:
 
   def readProject(): Either[ResolveError, ResolvableProject]
 
   def readModuleInclude(include: String): Either[ResolveError, ResolvableModule]
 
-}

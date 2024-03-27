@@ -1,6 +1,6 @@
 package com.github.tammo.yabt.command
 
-object CommandDomain {
+object CommandDomain:
 
   case class Command[T](
       name: String,
@@ -46,4 +46,3 @@ object CommandDomain {
       construct: (T, Int) => T
   ) extends Option[T, Int]
 
-}
