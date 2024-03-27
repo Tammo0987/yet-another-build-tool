@@ -52,7 +52,7 @@ class CompileTask(
     val scalaVersion = context.module.scalaVersion
 
     val dependencyChanges = makeDependencyChanges(sources)
-    val library = dependencyResolver
+    val compilerJarPaths = dependencyResolver
       .resolveDependencies(
         ScalaVersionUtil.scalaCompilerClasspath(scalaVersion).toSeq*
       )
@@ -63,7 +63,7 @@ class CompileTask(
     val output: SingleOutput = () => classesDirectory.toFile
 
     val bridgeProvider =
-      DefaultBridgeProvider(scalaVersion, dependencyResolver)
+      DefaultBridgeProvider(scalaVersion, dependencyResolver, compilerJarPaths)
 
     val scalaCompiler =
       ScalaCompilerFactory.createScalaCompiler(scalaVersion, bridgeProvider)
@@ -88,7 +88,7 @@ class CompileTask(
 
     scalaCompiler.compile(
       sources.map(PlainVirtualFile(_)).toArray,
-      (library ++ dependencyPaths).map(PlainVirtualFile(_)).toArray,
+      (compilerJarPaths ++ dependencyPaths).map(PlainVirtualFile(_)).toArray,
       PlainVirtualFileConverter(),
       dependencyChanges,
       Array.empty,

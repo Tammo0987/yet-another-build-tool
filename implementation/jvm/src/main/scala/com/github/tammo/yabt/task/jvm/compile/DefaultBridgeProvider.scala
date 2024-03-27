@@ -12,7 +12,8 @@ import java.nio.file.Path
 
 class DefaultBridgeProvider(
     private val scalaVersion: String,
-    private val dependencyResolver: DependencyResolver
+    private val dependencyResolver: DependencyResolver,
+    private val compilerJarPaths: Seq[Path]
 ) extends CompilerBridgeProvider:
 
   override def fetchCompiledBridge(
@@ -55,17 +56,16 @@ class DefaultBridgeProvider(
       logger: Logger
   ): ScalaInstance =
     val errorOrInstance = for {
-      loadedCompilerJars <- fetchCompiler()
       loadedLibraryJars <- fetchLibrary()
     } yield new ScalaInstance:
       override def version(): String = scalaVersion
 
       override def loader(): ClassLoader = createClassLoader(
-        loadedCompilerJars ++ loadedLibraryJars
+        compilerJarPaths ++ loadedLibraryJars
       )
 
       override def loaderCompilerOnly(): ClassLoader = createClassLoader(
-        loadedCompilerJars
+        compilerJarPaths
       )
 
       override def loaderLibraryOnly(): ClassLoader = createClassLoader(
@@ -76,7 +76,7 @@ class DefaultBridgeProvider(
         loadedLibraryJars.map(_.toFile).toArray
 
       override def compilerJars(): Array[File] =
-        loadedCompilerJars.map(_.toFile).toArray
+        compilerJarPaths.map(_.toFile).toArray
 
       override def otherJars(): Array[File] =
         allJars().filterNot(jar =>
@@ -92,12 +92,6 @@ class DefaultBridgeProvider(
         throw error.throwable
       case Right(scalaInstance) =>
         scalaInstance
-
-  private def fetchCompiler(): Either[DependencyResolveError, Seq[Path]] =
-    dependencyResolver
-      .resolveDependencies(
-        ScalaVersionUtil.scalaCompilerClasspath(scalaVersion).toSeq*
-      )
 
   private def fetchLibrary(): Either[DependencyResolveError, Seq[Path]] =
     dependencyResolver
