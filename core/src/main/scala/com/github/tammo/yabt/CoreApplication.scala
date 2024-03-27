@@ -2,7 +2,6 @@ package com.github.tammo.yabt
 
 import com.github.tammo.yabt.Error.*
 import com.github.tammo.yabt.Error.ReadError.*
-import com.github.tammo.yabt.ResolvedProject.ModuleReference
 import com.github.tammo.yabt.cli.CommandLineInterface
 import com.github.tammo.yabt.command.CommandDomain.Command
 import com.github.tammo.yabt.module.ModuleDiscovery
@@ -64,8 +63,7 @@ class CoreApplication(
           TaskContext(
             Path.of(""),
             project.getOrElse(null),
-            ModuleReference("/"),
-            project.getOrElse(null).scalaVersion
+            project.getOrElse(null).toModule
           )
         )
 
@@ -86,4 +84,3 @@ class CoreApplication(
       logger.error(s"Illegal root reference found: ${path.mkString(" / ")}")
     case CyclicReference(path) =>
       logger.error(s"Cyclic reference found: ${path.mkString(" / ")}")
-

@@ -1,9 +1,10 @@
 package com.github.tammo.yabt.project
 
 import com.github.tammo.yabt.Error.*
-import com.github.tammo.yabt.extensions.MapExtensions.liftToEither
 import com.github.tammo.yabt.ResolvableProject.{Scope as ResolvableScope, *}
 import com.github.tammo.yabt.ResolvedProject.*
+import com.github.tammo.yabt.ResolvedProject.Module.ResolvedModule
+import com.github.tammo.yabt.extensions.MapExtensions.liftToEither
 import com.github.tammo.yabt.extensions.SetExtensions.liftToEither
 
 class DefaultProjectResolver(private val projectReader: ProjectReader)
@@ -14,10 +15,10 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
   override def resolveProject(
       resolvableProject: ResolvableProject
   ): Either[ResolveError, ResolvedProject] = for {
-    resolvedModules <- readModuleIncludes(
+    Modules <- readModuleIncludes(
       resolvableProject.modules.values.toSet
     )
-    resolvedProject <- resolveProject(resolvableProject, resolvedModules)
+    resolvedProject <- resolveProject(resolvableProject, Modules)
   } yield resolvedProject
 
   private def combineModuleIncludesRecursive(
@@ -27,7 +28,7 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
     for {
       module <- resolvableModule
 
-      resolvedModules <- Right(
+      Modules <- Right(
         module.includes.map(include =>
           combineModuleIncludesRecursive(
             checkCyclesAndResolveModuleInclude(include, path),
@@ -37,7 +38,7 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       )
 
       combinedResolvableModule <- combineModulesIncludes(
-        resolvedModules
+        Modules
       )
     } yield module ++ combinedResolvableModule
 
@@ -103,10 +104,10 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       version,
       directory,
       scalaVersion,
+      module.plugins,
       module.dependencies.map(mapDependency),
       module.dependsOn.map(ModuleReference.apply),
-      module.aggregates.map(ModuleReference.apply),
-      module.plugins
+      module.aggregates.map(ModuleReference.apply)
     )
 
   private def resolveProject(
@@ -119,6 +120,8 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       Version(resolvableProject.version),
       resolvableProject.scalaVersion,
       resolvableProject.plugins,
+      Set.empty,
+      Set.empty,
       Set.empty,
       modules
     )
@@ -133,4 +136,3 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
         case ResolvableScope.Compile => Scope.Compile
         case ResolvableScope.Test    => Scope.Test
     )
-

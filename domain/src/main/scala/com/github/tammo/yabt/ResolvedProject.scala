@@ -1,5 +1,7 @@
 package com.github.tammo.yabt
 
+import com.github.tammo.yabt.ResolvedProject.Module.RootModule
+
 object ResolvedProject:
 
   opaque type Name <: String = String
@@ -14,6 +16,8 @@ object ResolvedProject:
   object Organization:
     def apply(string: String): Organization = string
 
+  opaque type RootModuleReference = ModuleReference
+
   opaque type ModuleReference <: String = String
   object ModuleReference:
     def apply(string: String): ModuleReference = string
@@ -25,20 +29,68 @@ object ResolvedProject:
       scalaVersion: String,
       plugins: Set[String],
       dependencies: Set[ResolvedDependency],
-      modules: Map[Name, ResolvedModule]
-  )
-
-  case class ResolvedModule(
-      name: Name,
-      organization: Organization,
-      version: Version,
-      directory: String,
-      scalaVersion: String,
-      dependencies: Set[ResolvedDependency],
       dependsOn: Set[ModuleReference],
       aggregates: Set[ModuleReference],
-      plugins: Set[String]
-  )
+      modules: Map[Name, Module.ResolvedModule]
+  ):
+
+    def toModule: RootModule = RootModule(
+      organization,
+      version,
+      scalaVersion,
+      plugins,
+      dependencies,
+      dependsOn,
+      aggregates
+    )
+
+  enum Module(
+      val organization: Organization,
+      val version: Version,
+      val scalaVersion: String,
+      val plugins: Set[String],
+      val dependencies: Set[ResolvedDependency],
+      val dependsOn: Set[ModuleReference],
+      val aggregates: Set[ModuleReference]
+  ):
+
+    case ResolvedModule(
+        name: Name,
+        override val organization: Organization,
+        override val version: Version,
+        directory: String,
+        override val scalaVersion: String,
+        override val plugins: Set[String],
+        override val dependencies: Set[ResolvedDependency],
+        override val dependsOn: Set[ModuleReference],
+        override val aggregates: Set[ModuleReference]
+    ) extends Module(
+          organization,
+          version,
+          scalaVersion,
+          plugins,
+          dependencies,
+          dependsOn,
+          aggregates
+        )
+
+    case RootModule(
+        override val organization: Organization,
+        override val version: Version,
+        override val scalaVersion: String,
+        override val plugins: Set[String],
+        override val dependencies: Set[ResolvedDependency],
+        override val dependsOn: Set[ModuleReference],
+        override val aggregates: Set[ModuleReference]
+    ) extends Module(
+          organization,
+          version,
+          scalaVersion,
+          plugins,
+          dependencies,
+          dependsOn,
+          aggregates
+        )
 
   case class ResolvedDependency(
       organization: Organization,

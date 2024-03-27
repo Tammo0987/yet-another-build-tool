@@ -35,7 +35,7 @@ object DefaultProjectVerifier extends ProjectVerifier:
 
   private def verifyReferences(
       project: ResolvedProject,
-      referenceExtractor: ResolvedModule => Set[ModuleReference]
+      referenceExtractor: Module => Set[ModuleReference]
   ): Either[ResolveError, ResolvedProject] =
     project.modules.view
       .mapValues(
@@ -62,11 +62,11 @@ object DefaultProjectVerifier extends ProjectVerifier:
 
   private def verifyNoCyclesInModuleReference(
       project: ResolvedProject,
-      referenceExtractor: ResolvedModule => Set[ModuleReference]
+      referenceExtractor: Module => Set[ModuleReference]
   ): Either[ResolveError, ResolvedProject] =
 
     def findCycles(
-        current: ResolvedModule,
+        current: Module,
         path: Seq[String]
     ): Either[ResolveError, ResolvedProject] =
       val references = referenceExtractor(current)
@@ -75,11 +75,11 @@ object DefaultProjectVerifier extends ProjectVerifier:
       else
         references
           .map(module => {
-            val resolvedModule = project.modules(Name(module))
-            if (path.contains(resolvedModule.name)) {
-              Left(CyclicReference(path :+ resolvedModule.name))
+            val Module = project.modules(Name(module))
+            if (path.contains(Module.name)) {
+              Left(CyclicReference(path :+ Module.name))
             } else {
-              findCycles(resolvedModule, path :+ module)
+              findCycles(Module, path :+ module)
             }
           })
           .liftToEither()
@@ -90,4 +90,3 @@ object DefaultProjectVerifier extends ProjectVerifier:
       .toMap
       .liftToEither()
       .flatMap(_ => Right(project))
-

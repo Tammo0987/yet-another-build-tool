@@ -1,6 +1,7 @@
 package com.github.tammo.yabt.project
 
 import com.github.tammo.yabt.ResolvedProject.*
+import com.github.tammo.yabt.ResolvedProject.Module.ResolvedModule
 import io.circe.generic.semiauto.deriveEncoder
 import io.circe.syntax.*
 import io.circe.yaml.Printer
@@ -27,10 +28,10 @@ object ResolvedProjectPrinter:
 
   private given Encoder[Scope] = (a: Scope) => Json.fromString(a.toString)
 
-  private given Encoder[ResolvedModule] = deriveEncoder[ResolvedModule]
-
   private given KeyEncoder[Name] =
     KeyEncoder.encodeKeyString.contramap(identity)
+
+  private given Encoder[ResolvedModule] = deriveEncoder[ResolvedModule]
 
   private given Encoder[ResolvedProject] = deriveEncoder[ResolvedProject]
 

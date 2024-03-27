@@ -50,15 +50,19 @@ class CompileTask(
       .asScala
       .toSet
 
+    // TODO probably calculate from module before executing task
+    val scalaVersion = context.module.scalaVersion
+
     val dependencyChanges = makeDependencyChanges(sources)
-    val library = dependencyResolver.resolveDependencies(
-      ScalaVersionUtil.scalaCompilerClasspath(context.scalaVersion).toSeq*
-    ).getOrElse(Seq.empty) // TODO fix error handling after reworked task evaluation
+    val library = dependencyResolver
+      .resolveDependencies(
+        ScalaVersionUtil.scalaCompilerClasspath(scalaVersion).toSeq*
+      )
+      .getOrElse(
+        Seq.empty
+      ) // TODO fix error handling after reworked task evaluation
 
     val output: SingleOutput = () => classesDirectory.toFile
-
-    // TODO probably calculate from module before executing task
-    val scalaVersion = context.rootProject.scalaVersion
 
     val bridgeProvider =
       DefaultBridgeProvider(scalaVersion, dependencyResolver)

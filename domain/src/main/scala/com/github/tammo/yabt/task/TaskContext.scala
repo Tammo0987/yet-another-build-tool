@@ -1,12 +1,11 @@
 package com.github.tammo.yabt.task
 
-import com.github.tammo.yabt.ResolvedProject.{ModuleReference, ResolvedProject}
+import com.github.tammo.yabt.ResolvedProject.{Module, ResolvedProject}
 
 import java.nio.file.Path
 
 case class TaskContext(
-    workingDirectory: Path,
+    workingDirectory: Path, // TODO derive from module?
     rootProject: ResolvedProject,
-    module: ModuleReference,
-    scalaVersion: String // TODO fix this after fixing the modules and projects domain
+    module: Module
 )
