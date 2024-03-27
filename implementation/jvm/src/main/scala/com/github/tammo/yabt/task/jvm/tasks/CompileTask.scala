@@ -29,8 +29,7 @@ class CompileTask(
   private val logger = LoggerFactory.getLogger(getClass)
 
   private def compile(context: TaskContext): Set[Path] =
-    val moduleDirectory =
-      context.workingDirectory /// context.module.toString // TODO fix module access
+    val moduleDirectory = context.moduleDirectory
     val source =
       moduleDirectory / "src" / "main" / "scala" // TODO introduce source sets
 
@@ -50,7 +49,6 @@ class CompileTask(
       .asScala
       .toSet
 
-    // TODO probably calculate from module before executing task
     val scalaVersion = context.module.scalaVersion
 
     val dependencyChanges = makeDependencyChanges(sources)

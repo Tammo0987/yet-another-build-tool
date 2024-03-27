@@ -13,7 +13,7 @@ object ScalaVersionUtil:
       case s"3.$_" =>
         Set(
           Dependency(Module(groupId, ArtifactId("scala3-compiler_3")), version)
-        ) // TODO _3 here?
+        )
       case _ =>
         Set(
           Dependency(Module(groupId, ArtifactId("scala-compiler")), version),
