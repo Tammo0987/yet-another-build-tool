@@ -57,9 +57,10 @@ class CoreApplication(
           .map(_.info.name)
           .foreach(taskName => logger.debug(s"Recognized task: $taskName"))
 
-        // TODO remove
-        val x = recognizedTasks.tail.head
-        taskEvaluator.evaluateTask(x)(using
+        // TODO remove currently just for testing
+        val compileTask = recognizedTasks.tail.head
+        taskEvaluator.evaluateTask(
+          compileTask,
           TaskContext(
             Path.of(""),
             project.getOrElse(null),

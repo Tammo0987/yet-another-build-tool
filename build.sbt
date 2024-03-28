@@ -30,6 +30,7 @@ lazy val scalaModule: Seq[Setting[?]] = yabtModule ++ Seq(
     "-Wunused:privates",
     "-Xfatal-warnings",
     "-Ysafe-init",
+    // "-Yexplicit-nulls", // TODO enable explicit nulls
     "-rewrite",
     "-indent"
   )

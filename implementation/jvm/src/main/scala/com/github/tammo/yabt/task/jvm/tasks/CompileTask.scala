@@ -3,7 +3,6 @@ package com.github.tammo.yabt.task.jvm.tasks
 import com.github.tammo.yabt.dependency.DependencyDomain.*
 import com.github.tammo.yabt.dependency.DependencyResolver
 import com.github.tammo.yabt.extensions.PathExtensions.*
-import com.github.tammo.yabt.task.Task.Pure
 import com.github.tammo.yabt.task.TaskDSL.task
 import com.github.tammo.yabt.task.jvm.compile.*
 import com.github.tammo.yabt.task.{Task, TaskContext}
@@ -21,33 +20,40 @@ class CompileTask(
     private val dependencyResolver: DependencyResolver
 ):
 
-  lazy val compileTask: Task[Set[Path]] =
-    task("compile", "Compiles all sources of a module") { context =>
-      Pure(compile(context))
+  lazy val collectSourcesTask: Task[Set[Path]] =
+    task("sources", "Collects all sources") { context =>
+      val moduleDirectory = context.moduleDirectory
+      val source =
+        moduleDirectory / "src" / "main" / "scala" // TODO introduce source sets
+
+      if (Files.notExists(source))
+        Files.createDirectories(source)
+
+      Files
+        .walk(source)
+        .filter(Files.isRegularFile(_))
+        .filter(_.toString.endsWith(".scala"))
+        .toList
+        .asScala
+        .toSet
     }
+
+  lazy val compileTask: Task[Set[Path]] =
+    task("compile", "Compiles all sources of a module")(ctx =>
+      compile(using ctx)
+    )
 
   private val logger = LoggerFactory.getLogger(getClass)
 
-  private def compile(context: TaskContext): Set[Path] =
+  private def compile(using context: TaskContext): Set[Path] =
     val moduleDirectory = context.moduleDirectory
-    val source =
-      moduleDirectory / "src" / "main" / "scala" // TODO introduce source sets
 
     val classesDirectory = moduleDirectory / "target" / "classes"
-
-    if (Files.notExists(source))
-      Files.createDirectories(source)
 
     if (Files.notExists(classesDirectory))
       Files.createDirectories(classesDirectory)
 
-    val sources = Files
-      .walk(source)
-      .filter(Files.isRegularFile(_))
-      .filter(_.toString.endsWith(".scala"))
-      .toList
-      .asScala
-      .toSet
+    val sources = collectSourcesTask.evaluate
 
     val scalaVersion = context.module.scalaVersion
 
