@@ -59,7 +59,7 @@ class CoreApplication(
 
         // TODO remove currently just for testing
         val compileTask = recognizedTasks.tail.head
-        taskEvaluator.evaluateTask(
+        val result = taskEvaluator.evaluateTask(
           compileTask,
           TaskContext(
             Path.of(""),
@@ -67,6 +67,8 @@ class CoreApplication(
             project.getOrElse(null).toModule
           )
         )
+
+        logger.info(result.toString)
 
         logger.info(commandLineInterface.processArguments(input))
 

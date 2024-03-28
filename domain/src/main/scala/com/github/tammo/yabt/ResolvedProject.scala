@@ -31,7 +31,7 @@ object ResolvedProject:
       dependencies: Set[ResolvedDependency],
       dependsOn: Set[ModuleReference],
       aggregates: Set[ModuleReference],
-      modules: Map[Name, Module.ResolvedModule]
+      modules: Map[ModuleReference, Module.ResolvedModule]
   ):
 
     def toModule: RootModule = RootModule(
@@ -55,7 +55,7 @@ object ResolvedProject:
   ):
 
     case ResolvedModule(
-        name: Name,
+        name: ModuleReference,
         override val organization: Organization,
         override val version: Version,
         directory: String,

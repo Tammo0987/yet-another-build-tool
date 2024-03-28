@@ -2,6 +2,7 @@ name: test-project
 version: 1.0.0
 organization: com.github.tammo
 scalaVersion: 3.4.0
+aggregates: [ test ]
 dependencies:
   - organization: io.get-coursier
     name: coursier_2.13

@@ -15,10 +15,10 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
   override def resolveProject(
       resolvableProject: ResolvableProject
   ): Either[ResolveError, ResolvedProject] = for {
-    Modules <- readModuleIncludes(
+    modules <- readModuleIncludes(
       resolvableProject.modules.values.toSet
     )
-    resolvedProject <- resolveProject(resolvableProject, Modules)
+    resolvedProject <- resolveProject(resolvableProject, modules)
   } yield resolvedProject
 
   private def combineModuleIncludesRecursive(
@@ -68,15 +68,17 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
 
   private def readModuleIncludes(
       modules: Set[ResolvableModule]
-  ): Either[ResolveError, Map[Name, ResolvedModule]] =
+  ): Either[ResolveError, Map[ModuleReference, ResolvedModule]] =
     modules
       .map { module =>
         combineModuleIncludesRecursive(Right(module), Seq(ROOT))
       }
       .liftToEither()
       .map(set =>
-        set.groupMapReduce(module => Name.apply(module.name.get))(identity) {
-          case (_, s) => s
+        set.groupMapReduce(module => ModuleReference.apply(module.name.get))(
+          identity
+        ) { case (_, s) =>
+          s
         }
       )
       .flatMap { map =>
@@ -87,7 +89,9 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       module: ResolvableModule
   ): Either[ResolveError, ResolvedModule] =
     for {
-      name <- module.name.map(Name.apply).toRight(MissingField("name"))
+      moduleName <- module.name
+        .map(ModuleReference.apply)
+        .toRight(MissingField("name"))
       organization <- module.organization
         .map(Organization.apply)
         .toRight(MissingField("organization"))
@@ -99,7 +103,7 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
         MissingField("scala version")
       )
     } yield ResolvedModule(
-      name,
+      moduleName,
       organization,
       version,
       directory,
@@ -112,7 +116,7 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
 
   private def resolveProject(
       resolvableProject: ResolvableProject,
-      modules: Map[Name, ResolvedModule]
+      modules: Map[ModuleReference, ResolvedModule]
   ): Either[ResolveError, ResolvedProject] = Right(
     ResolvedProject(
       Name(resolvableProject.name),
@@ -121,8 +125,8 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       resolvableProject.scalaVersion,
       resolvableProject.plugins,
       resolvableProject.dependencies.map(mapDependency),
-      Set.empty,
-      Set.empty,
+      resolvableProject.dependsOn.map(ModuleReference.apply),
+      resolvableProject.aggregates.map(ModuleReference.apply),
       modules
     )
   )

@@ -28,7 +28,7 @@ object ResolvedProjectPrinter:
 
   private given Encoder[Scope] = (a: Scope) => Json.fromString(a.toString)
 
-  private given KeyEncoder[Name] =
+  private given KeyEncoder[ModuleReference] =
     KeyEncoder.encodeKeyString.contramap(identity)
 
   private given Encoder[ResolvedModule] = deriveEncoder[ResolvedModule]

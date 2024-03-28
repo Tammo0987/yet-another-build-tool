@@ -40,7 +40,7 @@ object DefaultProjectVerifier extends ProjectVerifier:
     project.modules.view
       .mapValues(
         referenceExtractor(_)
-          .map(Name.apply)
+          .map(ModuleReference.apply)
           .map(name =>
             project.modules.get(name).toRight(MissingReference(name))
           )
@@ -75,7 +75,7 @@ object DefaultProjectVerifier extends ProjectVerifier:
       else
         references
           .map(module => {
-            val Module = project.modules(Name(module))
+            val Module = project.modules(module)
             if (path.contains(Module.name)) {
               Left(CyclicReference(path :+ Module.name))
             } else {

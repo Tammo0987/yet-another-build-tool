@@ -12,6 +12,8 @@ object ResolvableProject:
       organization: String,
       scalaVersion: String,
       plugins: Set[String] = Set.empty,
+      dependsOn: Set[String] = Set.empty,
+      aggregates: Set[String] = Set.empty,
       dependencies: Set[Dependency] = Set.empty,
       modules: Map[String, ResolvableModule] = Map.empty
   )
@@ -54,4 +56,3 @@ object ResolvableProject:
   enum Scope:
     case Compile
     case Test
-
