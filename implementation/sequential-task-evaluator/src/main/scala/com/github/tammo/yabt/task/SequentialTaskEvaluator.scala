@@ -6,28 +6,39 @@ import com.github.tammo.yabt.task.Task.Result.*
 
 object SequentialTaskEvaluator extends TaskEvaluator:
 
-  // TODO optimize skipping of evaluation. Only evaluate if necessary.
   override def evaluateTask[T](task: Task[T], ctx: TaskContext): Result[T] =
-    val aggregateResults: Set[Result[T]] =
-      ctx.module.aggregates.map(moduleReference =>
-        evaluateTaskForModule(moduleReference, task, ctx)
-      )
-    (aggregateResults + Success(task.evaluate(using ctx)))
-      .foldLeft[Result[T]](Skipped) { case (first, second) =>
-        first match
-          case _: Success[T]     => second
-          case failed: Failed[T] => failed
-          case error: Error[T]   => error
-          case Skipped           => second
-      }
+    import TaskEvaluation.*
 
-  private def evaluateTaskForModule[T](
+    val tasksToExecute: Seq[TaskEvaluation] = TaskToEvaluate(ctx) +:
+      ctx.module.aggregates.map(moduleReferenceToTaskEvaluation(_, ctx))
+
+    tasksToExecute.foldRight[Option[Result[T]]](None):
+      case (taskEvaluation, previousResult) =>
+        previousResult match
+          case skipped @ Some(Skipped)   => skipped
+          case error @ Some(Error(_, _)) => error
+          case failed @ Some(Failed(_))  => failed
+          case _ =>
+            taskEvaluation match
+              case FailedBeforeEvaluation(message) => Some(Failed(message))
+              case TaskToEvaluate(taskContext) =>
+                Some(Success(task.evaluate(using taskContext)))
+    match
+      case Some(result) => result
+      case None         => Failed(s"No result for task ${task.info.name}.")
+
+  private enum TaskEvaluation:
+    case FailedBeforeEvaluation(message: String)
+    case TaskToEvaluate(taskContext: TaskContext)
+
+  private def moduleReferenceToTaskEvaluation(
       moduleReference: ModuleReference,
-      task: Task[T],
       taskContext: TaskContext
-  ): Result[T] =
-    val module = taskContext.rootProject.modules.get(moduleReference)
-    module match
-      case Some(newModule) =>
-        evaluateTask(task, taskContext.copy(module = newModule))
-      case None => Failed(s"Aggregates undefined module $moduleReference")
+  ): TaskEvaluation =
+    taskContext.rootProject.modules.get(moduleReference) match
+      case None =>
+        TaskEvaluation.FailedBeforeEvaluation(
+          s"Aggregates references undefined module $moduleReference."
+        )
+      case Some(module) =>
+        TaskEvaluation.TaskToEvaluate(taskContext.copy(module = module))

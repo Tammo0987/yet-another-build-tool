@@ -15,6 +15,6 @@ trait LoggedDependencyResolver extends DependencyResolver:
       dependencies: Dependency*
   ): Either[DependencyResolveError, Seq[Path]] =
     dependencies.foreach(dependency =>
-      logger.info(s"Fetching dependency $dependency")
+      logger.debug(s"Fetching dependency $dependency")
     )
     super.resolveDependencies(dependencies*)

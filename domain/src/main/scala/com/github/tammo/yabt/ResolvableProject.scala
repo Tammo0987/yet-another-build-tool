@@ -13,7 +13,7 @@ object ResolvableProject:
       scalaVersion: String,
       plugins: Set[String] = Set.empty,
       dependsOn: Set[String] = Set.empty,
-      aggregates: Set[String] = Set.empty,
+      aggregates: Seq[String] = Seq.empty,
       dependencies: Set[Dependency] = Set.empty,
       modules: Map[String, ResolvableModule] = Map.empty
   )
@@ -26,7 +26,7 @@ object ResolvableProject:
       scalaVersion: Option[String] = None,
       dependencies: Set[Dependency] = Set.empty,
       dependsOn: Set[String] = Set.empty,
-      aggregates: Set[String] = Set.empty,
+      aggregates: Seq[String] = Seq.empty,
       plugins: Set[String] = Set.empty,
       includes: Seq[String] = Seq.empty
   ):

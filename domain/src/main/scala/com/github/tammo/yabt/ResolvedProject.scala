@@ -16,8 +16,6 @@ object ResolvedProject:
   object Organization:
     def apply(string: String): Organization = string
 
-  opaque type RootModuleReference = ModuleReference
-
   opaque type ModuleReference <: String = String
   object ModuleReference:
     def apply(string: String): ModuleReference = string
@@ -30,7 +28,7 @@ object ResolvedProject:
       plugins: Set[String],
       dependencies: Set[ResolvedDependency],
       dependsOn: Set[ModuleReference],
-      aggregates: Set[ModuleReference],
+      aggregates: Seq[ModuleReference],
       modules: Map[ModuleReference, Module.ResolvedModule]
   ):
 
@@ -51,7 +49,7 @@ object ResolvedProject:
       val plugins: Set[String],
       val dependencies: Set[ResolvedDependency],
       val dependsOn: Set[ModuleReference],
-      val aggregates: Set[ModuleReference]
+      val aggregates: Seq[ModuleReference]
   ):
 
     case ResolvedModule(
@@ -63,7 +61,7 @@ object ResolvedProject:
         override val plugins: Set[String],
         override val dependencies: Set[ResolvedDependency],
         override val dependsOn: Set[ModuleReference],
-        override val aggregates: Set[ModuleReference]
+        override val aggregates: Seq[ModuleReference]
     ) extends Module(
           organization,
           version,
@@ -81,7 +79,7 @@ object ResolvedProject:
         override val plugins: Set[String],
         override val dependencies: Set[ResolvedDependency],
         override val dependsOn: Set[ModuleReference],
-        override val aggregates: Set[ModuleReference]
+        override val aggregates: Seq[ModuleReference]
     ) extends Module(
           organization,
           version,

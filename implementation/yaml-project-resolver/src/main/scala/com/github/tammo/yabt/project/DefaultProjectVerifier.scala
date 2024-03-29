@@ -31,7 +31,7 @@ object DefaultProjectVerifier extends ProjectVerifier:
   private def verifyAggregatesReferences(
       project: ResolvedProject
   ): Either[ResolveError, ResolvedProject] =
-    verifyReferences(project, _.aggregates)
+    verifyReferences(project, _.aggregates.toSet)
 
   private def verifyReferences(
       project: ResolvedProject,
@@ -58,7 +58,7 @@ object DefaultProjectVerifier extends ProjectVerifier:
   private def verifyNoCycleInModuleAggregates(
       project: ResolvedProject
   ): Either[ResolveError, ResolvedProject] =
-    verifyNoCyclesInModuleReference(project, _.aggregates)
+    verifyNoCyclesInModuleReference(project, _.aggregates.toSet)
 
   private def verifyNoCyclesInModuleReference(
       project: ResolvedProject,

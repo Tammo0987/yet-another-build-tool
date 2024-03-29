@@ -7,3 +7,11 @@ dependencies:
   - organization: io.get-coursier
     name: coursier_2.13
     version: 2.1.9
+modules:
+  test:
+    name: test
+    # TODO extend from parent
+    organization: com.github.tammo
+    version: 1.0.0
+    directory: test
+    scalaVersion: 3.4.0
