@@ -16,7 +16,8 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       resolvableProject: ResolvableProject
   ): Either[ResolveError, ResolvedProject] = for {
     modules <- readModuleIncludes(
-      resolvableProject.modules.values.toSet
+      resolvableProject.modules,
+      resolvableProject
     )
     resolvedProject <- resolveProject(resolvableProject, modules)
   } yield resolvedProject
@@ -67,7 +68,8 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
       )
 
   private def readModuleIncludes(
-      modules: Set[ResolvableModule]
+      modules: Set[ResolvableModule],
+      project: ResolvableProject
   ): Either[ResolveError, Map[ModuleReference, ResolvedModule]] =
     modules
       .map { module =>
@@ -82,26 +84,31 @@ class DefaultProjectResolver(private val projectReader: ProjectReader)
         }
       )
       .flatMap { map =>
-        map.view.mapValues(resolveModules).toMap.liftToEither()
+        map.view.mapValues(resolveModules(_, project)).toMap.liftToEither()
       }
 
   private def resolveModules(
-      module: ResolvableModule
+      module: ResolvableModule,
+      project: ResolvableProject
   ): Either[ResolveError, ResolvedModule] =
     for {
       moduleName <- module.name
         .map(ModuleReference.apply)
         .toRight(MissingField("name"))
       organization <- module.organization
+        .orElse(Some(project.organization))
         .map(Organization.apply)
         .toRight(MissingField("organization"))
       version <- module.version
+        .orElse(Some(project.version))
         .map(Version.apply)
         .toRight(MissingField("version"))
       directory <- module.directory.toRight(MissingField("directory"))
-      scalaVersion <- module.scalaVersion.toRight(
-        MissingField("scala version")
-      )
+      scalaVersion <- module.scalaVersion
+        .orElse(Some(project.scalaVersion))
+        .toRight(
+          MissingField("scala version")
+        )
     } yield ResolvedModule(
       moduleName,
       organization,

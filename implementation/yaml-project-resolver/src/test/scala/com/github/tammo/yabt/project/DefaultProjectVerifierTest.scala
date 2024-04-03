@@ -16,29 +16,27 @@ class DefaultProjectVerifierTest extends AnyFlatSpecLike with Matchers:
     plugins = Set.empty,
     dependencies = Set.empty,
     dependsOn = Set.empty,
-    aggregates = Set.empty,
+    aggregates = Seq.empty,
     modules = Map.empty
   )
 
   private def emptyModule(name: String)(dependsOn: String*)(
       aggregates: String*
   ): ResolvedModule = ResolvedModule(
-    name = Name(name),
+    name = ModuleReference(name),
     organization = Organization(""),
     version = Version(""),
     directory = "",
     scalaVersion = "",
     dependencies = Set.empty,
     dependsOn = dependsOn.toSet.map(ModuleReference(_)),
-    aggregates = aggregates.toSet.map(ModuleReference(_)),
+    aggregates = aggregates.map(ModuleReference(_)),
     plugins = Set.empty
   )
 
   extension (project: ResolvedProject)
-
     def withModule(module: ResolvedModule): ResolvedProject =
       project.copy(modules = project.modules + (module.name -> module))
-
 
   behavior of "verify references"
 

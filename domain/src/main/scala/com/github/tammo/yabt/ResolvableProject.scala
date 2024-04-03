@@ -15,7 +15,7 @@ object ResolvableProject:
       dependsOn: Set[String] = Set.empty,
       aggregates: Seq[String] = Seq.empty,
       dependencies: Set[Dependency] = Set.empty,
-      modules: Map[String, ResolvableModule] = Map.empty
+      modules: Set[ResolvableModule] = Set.empty
   )
 
   case class ResolvableModule(
