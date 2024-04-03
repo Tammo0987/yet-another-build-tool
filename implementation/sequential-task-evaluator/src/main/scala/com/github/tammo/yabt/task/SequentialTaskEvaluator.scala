@@ -21,8 +21,10 @@ object SequentialTaskEvaluator extends TaskEvaluator:
           case _ =>
             taskEvaluation match
               case FailedBeforeEvaluation(message) => Some(Failed(message))
-              case TaskToEvaluate(taskContext) =>
+              case TaskToEvaluate(taskContext) if taskContext == ctx =>
                 Some(Success(task.evaluate(using taskContext)))
+              case TaskToEvaluate(taskContext) =>
+                Option(evaluateTask(task, taskContext))
     match
       case Some(result) => result
       case None         => Failed(s"No result for task ${task.info.name}.")

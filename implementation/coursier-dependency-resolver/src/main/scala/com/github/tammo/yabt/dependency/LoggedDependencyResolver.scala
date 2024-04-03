@@ -1,4 +1,5 @@
 package com.github.tammo.yabt.dependency
+
 import com.github.tammo.yabt.dependency.DependencyDomain.{
   Dependency,
   DependencyResolveError
