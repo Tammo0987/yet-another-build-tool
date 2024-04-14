@@ -4,9 +4,10 @@ import com.github.tammo.yabt.ResolvedProject
 import com.github.tammo.yabt.dependency.DependencyDomain.*
 import com.github.tammo.yabt.dependency.DependencyResolver
 import com.github.tammo.yabt.extensions.PathExtensions.*
+import com.github.tammo.yabt.task.Task.Result.Success
 import com.github.tammo.yabt.task.TaskDSL.task
 import com.github.tammo.yabt.task.jvm.compile.*
-import com.github.tammo.yabt.task.{Task, TaskContext}
+import com.github.tammo.yabt.task.{Task, TaskContext, TaskEvaluator}
 import org.slf4j.LoggerFactory
 import sbt.internal.inc.{PlainVirtualFile, PlainVirtualFileConverter}
 import xsbti.*
@@ -18,7 +19,8 @@ import java.util.Optional
 import scala.jdk.CollectionConverters.*
 
 class CompileTask(
-    private val dependencyResolver: DependencyResolver
+    private val dependencyResolver: DependencyResolver,
+    private val taskEvaluator: TaskEvaluator
 ):
 
   lazy val collectSourcesTask: Task[Set[Path]] =
@@ -60,7 +62,11 @@ class CompileTask(
     if (Files.notExists(classesDirectory))
       Files.createDirectories(classesDirectory)
 
-    val sources = collectSourcesTask.evaluate
+    // TODO fix the dependencies to other tasks
+    val sources = taskEvaluator
+      .evaluateTask(collectSourcesTask, context)
+      .asInstanceOf[Success[Set[Path]]]
+      .value
 
     val scalaVersion = context.module.scalaVersion
 

@@ -22,7 +22,7 @@ object SequentialTaskEvaluator extends TaskEvaluator:
             taskEvaluation match
               case FailedBeforeEvaluation(message) => Some(Failed(message))
               case TaskToEvaluate(taskContext) if taskContext == ctx =>
-                Some(Success(task.evaluate(using taskContext)))
+                Some(task.action(taskContext))
               case TaskToEvaluate(taskContext) =>
                 Option(evaluateTask(task, taskContext))
     match
