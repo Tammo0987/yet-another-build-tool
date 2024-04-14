@@ -1,89 +1,71 @@
 package com.github.tammo.yabt
 
-import com.github.tammo.yabt.Resolve.*
-import com.github.tammo.yabt.Resolve.ReadError.*
+import com.github.tammo.yabt.CoreApplication.{CoreError, Dependencies}
+import com.github.tammo.yabt.Resolve.ResolveError
+import com.github.tammo.yabt.ResolvedProject.ResolvedProject
 import com.github.tammo.yabt.cli.CommandLineInterface
 import com.github.tammo.yabt.command.CommandDomain.Command
+import com.github.tammo.yabt.dependency.DependencyResolver
 import com.github.tammo.yabt.module.ModuleDiscovery
-import com.github.tammo.yabt.project.{ProjectReader, ProjectResolver}
-import com.github.tammo.yabt.task.{TaskContext, TaskEvaluator}
+import com.github.tammo.yabt.module.ModuleDiscovery.DiscoveryError
+import com.github.tammo.yabt.project.{ProjectProvider, ProjectReader, ProjectResolver}
+import com.github.tammo.yabt.task.TaskEvaluator
 import org.slf4j.LoggerFactory
 
-import java.nio.file.Path
-
-class CoreApplication(
-    private val projectReader: ProjectReader,
-    private val projectResolver: ProjectResolver,
-    private val commandLineInterfaceProvider: Set[
-      Command[?]
-    ] => CommandLineInterface,
-    private val moduleDiscovery: ModuleDiscovery,
-    private val serviceProvider: ServiceProvider,
-    private val taskEvaluator: TaskEvaluator
-):
+class CoreApplication(private val dependencies: Dependencies):
 
   private lazy val logger = LoggerFactory.getLogger(getClass)
 
-  def readProjectAndExecuteCommand(input: Array[String]): Unit =
-    val project = for {
+  def main(input: Array[String]): Either[CoreError, Unit] =
+    import dependencies.*
+
+    for {
       project <- projectReader.readProject()
       resolvedProject <- projectResolver.resolveProject(project)
-    } yield resolvedProject
+      _ = logger.info(
+        s"Project ${resolvedProject.name} in version ${resolvedProject.version} loaded."
+      )
+      modules <- moduleDiscovery.discoverModules
+      serviceProvider = createServiceProvider(resolvedProject)
+      commands = modules.flatMap(module =>
+        module.commands ++ module.commands(serviceProvider)
+      )
+      tasks = modules.flatMap(module =>
+        module.tasks ++ module.tasks(serviceProvider)
+      )
+      commandLineInterface = commandLineInterfaceProvider(
+        commands
+      )
 
-    project match
-      case Left(resolveError) =>
-        logResolveError(resolveError)
-        return
-      case Right(resolvedProject) =>
-        logger.info(
-          s"Project ${resolvedProject.name} in version ${resolvedProject.version} loaded."
-        )
+    } yield
+      if input.isEmpty then
+        new CommandLineInputLoop(commandLineInterface).loop()
+      else commandLineInterface.processArguments(input); ()
 
-    moduleDiscovery.discoverModules match
-      case Left(discoveryError) =>
-        logger.error(discoveryError.message, discoveryError.throwable)
-      case Right(modules) =>
-        val commands = modules.flatMap(module =>
-          module.commands ++ module.commands(serviceProvider)
-        )
-        val commandLineInterface = commandLineInterfaceProvider(commands)
+  private def createServiceProvider(
+      resolvedProject: ResolvedProject
+  ): ServiceProvider = new ServiceProvider:
+    override def dependencyResolver: DependencyResolver =
+      dependencies.dependencyResolver
 
-        val recognizedTasks =
-          modules.flatMap(module =>
-            module.tasks ++ module.tasks(serviceProvider)
-          )
+    override def projectProvider: ProjectProvider = new ProjectProvider:
+      override def project: ResolvedProject = resolvedProject
 
-        recognizedTasks
-          .map(_.info.name)
-          .foreach(taskName => logger.debug(s"Recognized task: $taskName"))
+    override def taskEvaluator: TaskEvaluator =
+      dependencies.taskEvaluator
 
-        // TODO remove currently just for testing
-        val compileTask = recognizedTasks.tail.head
-        val result = taskEvaluator.evaluateTask(
-          compileTask,
-          TaskContext(
-            Path.of(""),
-            project.getOrElse(null),
-            project.getOrElse(null).toModule
-          )
-        )
+object CoreApplication:
 
-        logger.info(result.toString)
+  case class Dependencies(
+      projectReader: ProjectReader,
+      projectResolver: ProjectResolver,
+      commandLineInterfaceProvider: CommandLineInterfaceProvider,
+      moduleDiscovery: ModuleDiscovery,
+      taskEvaluator: TaskEvaluator,
+      dependencyResolver: DependencyResolver
+  )
 
-        logger.info(commandLineInterface.processArguments(input))
+  private type CommandLineInterfaceProvider =
+    Set[Command[?]] => CommandLineInterface
 
-  private def logResolveError(error: ResolveError): Unit = error match
-    case FileError(message, underlying) =>
-      logger.error(message, underlying)
-    case ParseError(message, underlying) =>
-      logger.error(message, underlying)
-    case DecodingError(message, pathToRootString) =>
-      logger.error(s"$message ${pathToRootString.getOrElse("")}")
-    case MissingField(field) =>
-      logger.error(s"Missing field $field")
-    case MissingReference(reference) =>
-      logger.error(s"Missing reference: $reference")
-    case IllegalRootReference(path) =>
-      logger.error(s"Illegal root reference found: ${path.mkString(" / ")}")
-    case CyclicReference(path) =>
-      logger.error(s"Cyclic reference found: ${path.mkString(" / ")}")
+  type CoreError = ResolveError | DiscoveryError

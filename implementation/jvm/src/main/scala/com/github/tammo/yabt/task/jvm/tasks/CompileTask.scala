@@ -1,5 +1,6 @@
 package com.github.tammo.yabt.task.jvm.tasks
 
+import com.github.tammo.yabt.ResolvedProject
 import com.github.tammo.yabt.dependency.DependencyDomain.*
 import com.github.tammo.yabt.dependency.DependencyResolver
 import com.github.tammo.yabt.extensions.PathExtensions.*
@@ -46,6 +47,12 @@ class CompileTask(
   private val logger = LoggerFactory.getLogger(getClass)
 
   private def compile(using context: TaskContext): Set[Path] =
+    context.module match
+      case module: ResolvedProject.Module.ResolvedModule =>
+        logger.info(s"Compiling ${module.name} module")
+      case _: ResolvedProject.Module.RootModule =>
+        logger.info(s"Compiling root module")
+
     val moduleDirectory = context.moduleDirectory
 
     val classesDirectory = moduleDirectory / "target" / "classes"

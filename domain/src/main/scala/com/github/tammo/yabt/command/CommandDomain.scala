@@ -15,6 +15,7 @@ object CommandDomain:
     case Success
     case Error
 
+  // TODO better name, e. g. CommandOption
   sealed trait Option[T, V]:
     val name: String
     val description: String
@@ -45,4 +46,3 @@ object CommandDomain:
       validate: Int => Either[String, Int],
       construct: (T, Int) => T
   ) extends Option[T, Int]
-

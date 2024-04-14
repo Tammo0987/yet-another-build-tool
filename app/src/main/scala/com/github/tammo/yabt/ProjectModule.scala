@@ -7,7 +7,10 @@ object ProjectModule:
 
   val projectReader: ProjectReader = new YamlProjectReader
 
-  val projectResolver: ProjectResolver = DefaultProjectResolver(projectReader)
+  val projectResolver: ProjectResolver = new DefaultProjectResolver(
+    projectReader
+  ) with VerifiedProjectResolver:
+    override def projectVerifier: ProjectVerifier =
+      ProjectModule.projectVerifier
 
-  val projectVerifier: ProjectVerifier = DefaultProjectVerifier
-
+  private val projectVerifier: ProjectVerifier = DefaultProjectVerifier

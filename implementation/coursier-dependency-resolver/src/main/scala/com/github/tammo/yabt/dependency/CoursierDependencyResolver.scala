@@ -6,7 +6,7 @@ import coursier.{Fetch, ModuleName, Organization}
 
 import java.nio.file.Path
 
-class CoursierDependencyResolver extends DependencyResolver:
+object CoursierDependencyResolver extends DependencyResolver:
 
   override def resolveDependencies(
       dependencies: DependencyDomain.Dependency*

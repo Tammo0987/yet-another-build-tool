@@ -8,4 +8,4 @@ trait CommandLineInterface:
     * @return
     *   The result of the processing, which could be printed to a console.
     */
-  def processArguments(input: Array[String]): String
+  def processArguments(input: Array[String]): String  // TODO make the errors explicitly type

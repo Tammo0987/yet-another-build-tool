@@ -64,7 +64,7 @@ lazy val taskApi = project
   .in(file("api/task-api"))
   .settings(scalaModule)
   .settings(name := "task-api")
-  .dependsOn(domain)
+  .dependsOn(domain, projectResolverApi)
 
 lazy val dependencyApi = project
   .in(file("api/dependency-api"))

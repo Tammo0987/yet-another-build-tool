@@ -83,11 +83,10 @@ class ConsoleCommandLineInterface(
             result
           else
             parseArgument(result, next.tail.head, next.tail.tail)
+        else if (next.isEmpty)
+          result
         else
-          if (next.isEmpty)
-            result
-          else
-            parseArgument(result, next.head, next.tail)
+          parseArgument(result, next.head, next.tail)
       else if (current.startsWith("-") && current.length == 2)
         val flagName = current.slice(1, current.length)
         val option = command.options.find(_.name == flagName)
@@ -109,10 +108,10 @@ class ConsoleCommandLineInterface(
           result
         else
           parseArgument(result, next.head, next.tail)
-      else
-        Left(s"Malformed option $current")
+      else Left(s"Malformed option $current")
 
-    parseArgument(Right(command.default), arguments.head, arguments.tail)
+    if arguments.isEmpty then Right(command.default)
+    else parseArgument(Right(command.default), arguments.head, arguments.tail)
 
   private val equalRegex = "(\\w+)=(\\w+)".r
   private def parseOption(current: String, next: String): ParsedOption =
