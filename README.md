@@ -5,6 +5,9 @@ defined in YAML format, providing a simple and intuitive way to configure your p
 tasks. The main goal is to improve the speed of configuring the build and the performance of the tool itself compared to
 similar tools.
 
+## Disclaimer
+This is currently a learning project to understand build tools. If it becomes usable, then I will continue the work.
+
 ## Roadmap
 
 This is planned for now:
@@ -12,12 +15,11 @@ This is planned for now:
 - **Dependency Management**: Implement features for managing transitive dependencies and conflict resolution.
 
 - **Plugin System**: Extend yabt's functionality by seamlessly integrating custom tasks and extensions through the
-  plugin system.
-
-- **Optimized Compilation**: Introduce optimizations to speed up the compilation process and reduce build times.
-
-- **Integrated Code Quality Tools**: Integrate popular code quality tools such as Scalafix and scalafmt for
+  plugin system. For example integrate popular code quality tools such as Scalafix and scalafmt for
   comprehensive code analysis and formatting.
+
+- **Optimized Compilation**: Introduce optimizations to speed up the execution of the compilation process and reduce
+  build times.
 
 ## License
 
